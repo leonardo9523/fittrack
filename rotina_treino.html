@@ -27,6 +27,12 @@
             margin: 0;
             padding: 0;
             background-color: #000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body > .container {
+            flex: 1;
         }
 
         .logo {
@@ -119,13 +125,19 @@
         <form>
             <div class="mb-3 text-start">
                 <label for="textDate" class="form-label text-light">Data do treino</label>
-                <div class="input-group w-50" id="datepicker">
-                    <input type="text" class="form-control bg-dark border-primary text-light" id="textDate" />
-                    <span class="input-group-text bg-dark border-primary">
-                        <i class="bi bi-calendar text-white"></i>
-                    </span>
+                <div class="d-flex justify-content-between align-items-center gap-2">
+                    <div class="input-group w-50" id="datepicker">
+                        <input type="text" class="form-control bg-dark border-primary text-light" id="textDate" />
+                        <span class="input-group-text bg-dark border-primary">
+                            <i class="bi bi-calendar text-white"></i>
+                        </span>
+                    </div>
+                    <button type="button" class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                        <span class="material-symbols-outlined" id="addExercise">add</span>
+                    </button>
                 </div>
-                <script>
+            </div>
+            <script>
                 const datepicker = new tempusDominus.TempusDominus(document.getElementById('datepicker'), {
                     display: {
                     components: {
@@ -137,15 +149,11 @@
                     }
                     }
                 });
-                </script>
-            </div>
+            </script>
             <div class="mb-3 text-start">
                 <div class="card rounded-4 p-4 shadow text-center" style="background-color: #212529;">
                     <div class="d-flex justify-content-between align-items-center">
                         <h2 class="dashboard-title text-light mb-0">Adicionar exercício</h2>
-                        <button type="button" class="btn btn-primary rounded-4 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-                            <span class="material-symbols-outlined" id="addExercise">add</span>
-                        </button>
                     </div>
                     <div class="mb-3 text-start position-relative">
                         <label for="exerciseInput" class="form-label text-light">Buscar exercício</label>
@@ -155,7 +163,7 @@
                     <!-- Seletor de quantidade de séries -->
                     <div class="mb-3 text-start">
                         <label for="numSeries" class="form-label text-light">Número de séries</label>
-                        <input type="number" class="form-control bg-secondary text-light" id="numSeries" min="1" max="10" placeholder="Ex: 4">
+                        <input type="number" class="form-control bg-dark border-secondary text-light" id="numSeries" min="1" max="10" placeholder="Ex: 4">
                     </div>
 
                     <!-- Área onde aparecerão os campos de carga -->
@@ -184,7 +192,16 @@
                             }
                         });
                     </script>
-
+                </div>
+                <div class="container-fluid d-flex justify-content-between pt-4 pb-1 mt-2">
+                    <button type="button" class="btn btn-danger rounded-4 d-flex flex-column ">
+                        <span class="material-symbols-outlined">cancel</span>
+                        <span class="dashboard-title text-light m-0">Cancelar</span>
+                    </button>
+                    <button type="button" class="btn btn-success rounded-4 d-flex flex-column ">
+                        <span class="material-symbols-outlined">save</span>
+                        <span class="dashboard-title text-light m-0">Salvar</span>
+                    </button>
                 </div>
             </div>
         </form>
