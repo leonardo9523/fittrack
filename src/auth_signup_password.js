@@ -1,24 +1,11 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
-import {  getAuth, createUserWithEmailAndPassword, validatePassword } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
-
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+import { auth } from './firebase-config.js'; 
+import {  createUserWithEmailAndPassword, validatePassword } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
 
 const form = document.querySelector("form");
 const emailInput = document.getElementById("txtEmailSignup");
 const passwordInput = document.getElementById("txtPasswordSignup");
 const passwordConfirmationInput = document.getElementById("txtPasswordSignupConfirmation");
-//const auth = getAuth(); // Certifique-se de que o Firebase Auth está inicializado corretamente
+const messageElement = document.getElementById("signup-message"); // Adicione um <p id="signup-message"></p> no seu HTML
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -27,12 +14,19 @@ form.addEventListener("submit", async (e) => {
   const password = passwordInput.value;
   const confirm = passwordConfirmationInput.value;
 
+  messageElement.textContent = ""; 
+
   if (password !== confirm) {
-    alert("As senhas não coincidem!");
+    messageElement.textContent = "Erro: As senhas não coincidem!";
     return;
   }
 
-  const status = await validatePassword(getAuth(), password);
+  if (password.length < 6) {
+    messageElement.textContent = "Erro: A senha deve ter no mínimo 6 caracteres.";
+    return;
+  }
+
+  const status = await validatePassword(auth, password);
   if (!status.isValid) {
     // Password could not be validated. Use the status to show what
     // requirements are met and which are missing.
@@ -44,14 +38,20 @@ form.addEventListener("submit", async (e) => {
   }
 
   try {
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed up 
-        const user = userCredential.user;
-        // ...
-      })
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    // Sucesso!
+    const user = userCredential.user;
+    console.log("Cadastro realizado com sucesso!", user);
+    messageElement.style.color = "green";
+    messageElement.textContent = "Cadastro realizado com sucesso! Redirecionando...";    // Redirecionar para a página de dashboard
     window.location.href = "dashboard.html";
   } catch (error) {
-    alert("Erro ao cadastrar: " + error.message);
-  }
+      console.error("Erro ao cadastrar:", error.code, error.message);
+      if (error.code === 'auth/email-already-in-use') {
+          messageElement.textContent = "Erro: Este e-mail já está em uso.";
+      } else if (error.code === 'auth/invalid-email') {
+          messageElement.textContent = "Erro: O e-mail fornecido não é válido.";
+      } else {
+          messageElement.textContent = "Ocorreu um erro inesperado. Tente novamente.";
+      }  }
 });

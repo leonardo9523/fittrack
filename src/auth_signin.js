@@ -1,22 +1,11 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
-import {  getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
+import { auth } from './firebase-config.js'; 
+import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
 
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 
 const form = document.querySelector("form");
 const emailInput = document.getElementById("txtEmailSignin");
 const passwordInput = document.getElementById("txtPasswordSignin");
+const messageElement = document.getElementById("signin-message"); 
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -24,21 +13,25 @@ form.addEventListener("submit", async (e) => {
   const email = emailInput.value;
   const password = passwordInput.value;
 
+  messageElement.textContent = "";
+
   if (!email || !password) {
-        alert("Por favor, preencha todos os campos.");
-        return;
+      alert("Por favor, preencha todos os campos.");
+      return;
     }
 
   try {
-    signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-        // Signed in 
-        const user = userCredential.user;
-        window.location.href = "dashboard.html"; 
-        // ...
-    })
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      // Login bem-sucedido
+      const user = userCredential.user;
+      console.log("Login realizado com sucesso!", user);
+
+      // Redireciona para o dashboard
+      window.location.href = "dashboard.html";
     // ajuste conforme sua estrutura
   } catch (error) {
-    alert("Erro ao cadastrar: " + error.message);
-  }
+      // Tratamento de erros de login
+      console.error("Erro ao fazer login:", error.code, error.message);
+      // É uma boa prática não dizer se o erro foi no email ou na senha
+      messageElement.textContent = "E-mail ou senha inválidos.";  }
 });
