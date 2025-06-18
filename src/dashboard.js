@@ -2,7 +2,8 @@ import {  onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs
 import { auth } from './firebase-config.js'; 
 
 const userEmail = document.getElementById("lblUserEmail");
-const userLogout = document.getElementById("lblUserLogout");
+const userLogout = document.getElementById("lblLogout");
+const btnRegistrarTreino = document.getElementById("btnRegistrarTreino");
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
@@ -19,14 +20,20 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-userLogout.addEventListener("click", () => {
+userLogout.addEventListener("click", (event) => {
+    event.preventDefault();
     signOut(auth).then(() => {
         // Logout bem-sucedido.
         console.log("Usuário deslogado com sucesso.");
         // O onAuthStateChanged vai detectar a mudança e redirecionar automaticamente.
-    }).catch((error) => {
+    }).catch((error) => { 
         // Ocorreu um erro no logout.
         console.error("Erro ao fazer logout:", error);
         alert("Erro ao tentar sair.");
     });
+});
+
+btnRegistrarTreino.addEventListener("click", () => {
+    // Redireciona para a página de registro de treino
+    window.location.href = "registrar_novo_treino.html"; // ou o caminho correto para sua página de registro de treino
 });

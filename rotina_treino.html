@@ -17,7 +17,7 @@
 
     <!-- Tempus Dominus Styles -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.9.4/dist/css/tempus-dominus.min.css" crossorigin="anonymous">
-
+    <script type="module" src="src/rotina_treino.js"></script>
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="/src/style.css">
@@ -25,25 +25,28 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand d-flex align-items-center" href="#">
-                <img src="Img/logo.png" alt="Logo FitTrack" class="header-footer-logo me-2">
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
-                <ul class="navbar-nav mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Registro de treinos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Perfil</a>
-                    </li>
-                </ul>
-            </div>
+        <a class="navbar-brand d-flex align-items-center" href="dashboard.html">
+            <img src="Img/logo.png" alt="Logo FitTrack" class="header-footer-logo me-2">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+            <ul class="navbar-nav mb-2 mb-lg-0">
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="dashboard.html">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="registrar_novo_treino.html">Registro de treinos</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="lblUserEmail" href="#">Perfil</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="lblLogout" href="#">Sair</a>
+            </li>
+            </ul>
+        </div>
         </div>
     </nav>
     <div class="container">
@@ -61,7 +64,7 @@
                         </span>
                     </div>
                     <button type="button" class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-                        <span class="material-symbols-outlined" id="addExercise">add</span>
+                        <span class="material-symbols-outlined" id="btnAddExercise">add</span>
                     </button>
                 </div>
             </div>
@@ -73,54 +76,12 @@
                         date: true,
                         month: true,
                         year: true,
-                        decades: true,
+                        decades: true
                     }
                     }
                 });
             </script>
-            <div class="mb-3 text-start">
-                <div class="card rounded-4 p-4 shadow text-center" style="background-color: #212529;">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h2 class="dashboard-title text-light mb-0">Adicionar exercício</h2>
-                    </div>
-                    <div class="mb-3 text-start position-relative">
-                        <label for="exerciseInput" class="form-label text-light">Buscar exercício</label>
-                        <input type="text" class="form-control bg-dark border-secondary text-light" placeholder="Digite o nome do exercício">
-                        <ul class="list-group position-absolute w-100 mt-1" id="autocompleteList" style="z-index: 1000;"></ul>
-                    </div>
-                    <!-- Seletor de quantidade de séries -->
-                    <div class="mb-3 text-start">
-                        <label for="numSeries" class="form-label text-light">Número de séries</label>
-                        <input type="number" class="form-control bg-dark border-secondary text-light" id="numSeries" min="1" max="10" placeholder="Ex: 4">
-                    </div>
-
-                    <!-- Área onde aparecerão os campos de carga -->
-                    <div class="mb-3 text-start" id="seriesInputs"></div>
-
-                    <script>
-                        const numSeriesInput = document.getElementById('numSeries');
-                        const seriesInputsContainer = document.getElementById('seriesInputs');
-
-                        numSeriesInput.addEventListener('input', () => {
-                            const num = parseInt(numSeriesInput.value);
-                            seriesInputsContainer.innerHTML = ''; // limpa antes de gerar
-
-                            if (!isNaN(num) && num > 0 && num <= 10) {
-                            for (let i = 1; i <= num; i++) {
-                                const div = document.createElement('div');
-                                div.className = 'mb-2';
-
-                                div.innerHTML = `
-                                <label class="form-label text-light">Carga da série ${i}</label>
-                                <input type="number" class="form-control bg-secondary text-light" placeholder="Ex: 20kg">
-                                `;
-
-                                seriesInputsContainer.appendChild(div);
-                            }
-                            }
-                        });
-                    </script>
-                </div>
+            <div class="mb-3 text-start" id="exercicioContainer"></div>
                 <div class="container-fluid d-flex justify-content-between pt-4 pb-1 mt-2">
                     <button type="button" class="btn btn-danger rounded-4 d-flex flex-column ">
                         <span class="material-symbols-outlined">cancel</span>
@@ -131,7 +92,6 @@
                         <span class="dashboard-title text-light m-0">Salvar</span>
                     </button>
                 </div>
-            </div>
         </form>
     </div>
     <footer class="bg-dark text-light mt-5 py-4">
