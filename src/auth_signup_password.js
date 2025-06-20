@@ -1,11 +1,13 @@
-import { auth } from './firebase-config.js'; 
-import {  createUserWithEmailAndPassword, validatePassword } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
+import { auth, db } from './firebase-config.js'; 
+import { createUserWithEmailAndPassword, validatePassword } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
+import { setDoc, doc } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
+
 
 const form = document.querySelector("form");
 const emailInput = document.getElementById("txtEmailSignup");
 const passwordInput = document.getElementById("txtPasswordSignup");
 const passwordConfirmationInput = document.getElementById("txtPasswordSignupConfirmation");
-const messageElement = document.getElementById("signup-message"); // Adicione um <p id="signup-message"></p> no seu HTML
+const messageElement = document.getElementById("signup-message");
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -26,25 +28,20 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
-  const status = await validatePassword(auth, password);
-  if (!status.isValid) {
-    // Password could not be validated. Use the status to show what
-    // requirements are met and which are missing.
-
-    // If a criterion is undefined, it is not required by policy. If the
-    // criterion is defined but false, it is required but not fulfilled by
-    // the given password. For example:
-    const needsLowerCase = status.containsLowercaseLetter !== true;
-  }
-
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    // Sucesso!
     const user = userCredential.user;
+    await setDoc(doc(db, "usuarios", user.uid), {
+      email: user.email,
+      criadoEm: new Date()
+    });
+    
     console.log("Cadastro realizado com sucesso!", user);
     messageElement.style.color = "green";
     messageElement.textContent = "Cadastro realizado com sucesso! Redirecionando...";    // Redirecionar para a página de dashboard
-    window.location.href = "dashboard.html";
+    setTimeout(() => {
+      window.location.href = "dashboard.html";
+    }, 1500);  
   } catch (error) {
       console.error("Erro ao cadastrar:", error.code, error.message);
       if (error.code === 'auth/email-already-in-use') {
