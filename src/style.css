@@ -80,3 +80,13 @@ body > .container {
 #btnAddExercise {
   margin: 0;
 }
+
+.card-exercicio-collapsed .card-content-edit {
+    display: none;
+}
+
+.card-exercicio-collapsed .card-content-summary {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+}

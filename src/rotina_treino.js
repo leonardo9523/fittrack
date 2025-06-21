@@ -25,22 +25,28 @@ async function main() {
         cardDiv.className = 'card rounded-4 p-4 shadow text-center mb-3';
         cardDiv.style.backgroundColor = '#212529';
 
-        // Template HTML usando classes em vez de IDs para elementos repetidos
         cardDiv.innerHTML = `
-            <div class="d-flex justify-content-between align-items-center">
-                <h2 class="dashboard-title text-light mb-0">Adicionar exercício</h2>
-                <button type="button" class="btn-close btn-close-white btn-remover-exercicio" aria-label="Close"></button>
+            <div class="card-content-edit">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="dashboard-title text-light mb-0">Adicionar exercício</h2>
+                    <button type="button" class="btn-close btn-close-white btn-remover-exercicio" aria-label="Close"></button>
+                </div>
+                <div class="mb-3 text-start position-relative">
+                    <label class="form-label text-light">Buscar exercício</label>
+                    <input type="text" class="form-control bg-dark border-secondary text-light exercise-input" placeholder="Digite o nome do exercício">
+                    <ul class="list-group position-absolute w-100 mt-1 autocomplete-list" style="z-index: 1000;"></ul>
+                </div>
+                <div class="mb-3 text-start">
+                    <label class="form-label text-light">Número de séries</label>
+                    <input type="number" class="form-control bg-dark border-secondary text-light num-series-input" min="1" max="10" placeholder="Ex: 4">
+                </div>
+                <div class="mb-3 text-start series-inputs-container"></div>
+                <button type="button" class="btn btn-success btn-confirmar-exercicio w-100">Confirmar Exercício</button>
             </div>
-            <div class="mb-3 text-start position-relative">
-                <label class="form-label text-light">Buscar exercício</label>
-                <input type="text" class="form-control bg-dark border-secondary text-light exercise-input" placeholder="Digite o nome do exercício">
-                <ul class="list-group position-absolute w-100 mt-1 autocomplete-list" style="z-index: 1000;"></ul>
+            <div class="card-content-summary" style="display: none;">
+                <h3 class="dashboard-title text-light mb-0 exercise-summary-title">Exercício</h3>
+                <button type="button" class="btn btn-secondary btn-editar-exercicio">Editar</button>
             </div>
-            <div class="mb-3 text-start">
-                <label class="form-label text-light">Número de séries</label>
-                <input type="number" class="form-control bg-dark border-secondary text-light num-series-input" min="1" max="10" placeholder="Ex: 4">
-            </div>
-            <div class="mb-3 text-start series-inputs-container"></div>
         `;
 
         // --- ADICIONA OS EVENT LISTENERS PARA ESTE NOVO BLOCO ---
@@ -49,6 +55,9 @@ async function main() {
         const numSeriesInput = cardDiv.querySelector('.num-series-input');
         const seriesInputsContainer = cardDiv.querySelector('.series-inputs-container');
         const btnRemover = cardDiv.querySelector('.btn-remover-exercicio');
+        const btnConfirmar = cardDiv.querySelector('.btn-confirmar-exercicio');
+        const btnEditar = cardDiv.querySelector('.btn-editar-exercicio');
+        const summaryTitle = cardDiv.querySelector('.exercise-summary-title');
 
         // Lógica do Autocomplete
         input.addEventListener("input", () => {
@@ -81,6 +90,10 @@ async function main() {
                         <label class="form-label text-light">Carga da série ${i}</label>
                         <input type="number" class="form-control bg-secondary text-light" placeholder="Ex: 20kg">
                     </div>
+                    <div class="mb-2">
+                        <label class="form-label text-light">Número de repetições da série ${i}</label>
+                        <input type="number" class="form-control bg-secondary text-light" placeholder="Ex: 8 repetições">
+                    </div>
                 `;
             }
         });
@@ -88,6 +101,23 @@ async function main() {
         // Lógica para o botão de remover
         btnRemover.addEventListener('click', () => {
             cardDiv.remove();
+        });
+
+        btnConfirmar.addEventListener('click', () => {
+            const exerciseName = input.value;
+            if (!exerciseName) {
+                alert('Por favor, selecione um exercício antes de confirmar.');
+                return;
+            }
+            // Atualiza o título do resumo com o nome do exercício
+            summaryTitle.textContent = exerciseName;
+            // Adiciona a classe que "colapsa" o card
+            cardDiv.classList.add('card-exercicio-collapsed');
+        });
+
+        btnEditar.addEventListener('click', () => {
+            // Remove a classe para "expandir" o card de volta ao modo de edição
+            cardDiv.classList.remove('card-exercicio-collapsed');
         });
 
         return cardDiv;
