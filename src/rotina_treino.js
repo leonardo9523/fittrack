@@ -1,8 +1,29 @@
-import { db } from './firebase-config.js';
-import { collection, getDocs, query } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
+import { db, auth } from './firebase-config.js';
+import { collection, getDocs, query, doc, setDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
+
 
 // Função principal assíncrona para organizar o código
 async function main() {
+
+    const userEmail = document.getElementById("lblUserEmail");
+    let currentUser = null;
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // O usuário está logado!
+        currentUser = user;
+        console.log("Usuário logado:", user);
+        // Agora você pode pegar as informações dele, como o email
+        userEmail.textContent = user.email;
+    
+      } else {
+        // O usuário não está logado.
+        console.log("Nenhum usuário logado.");
+        // Redireciona para a página de login para proteger o dashboard
+        window.location.href = "index.html"; // ou sua página de login
+      }
+    });
     
     // 1. BUSCAR OS DADOS DO FIREBASE (COM TRATAMENTO DE ERRO)
     let exercises = [];
@@ -142,7 +163,79 @@ async function main() {
     // Inicializa a página com um bloco já criado
     exercicioContainer.appendChild(criarNovoBlocoDeExercicio());
 
+    function generateWorkoutId(user, dateStr) {
+        if (!user || !dateStr) return null;
+        // Formato YYYY-MM-DD -> YYYYMMDD
+        const formattedDate = dateStr.replace(/-/g, '');
+        return `${user.uid}-${formattedDate}-workout`;
+    }
+        
+
+    const btnSave = document.getElementById("btnSave");
+    const txtDate = document.getElementById("textDate");
+    btnSave.addEventListener("click", async () => {
+
+        if (!currentUser) {
+            alert("Erro: Usuário não está logado. Por favor, recarregue a página.");
+            return;
+        }
+        if (!txtDate.value) {
+            alert("Por favor, selecione a data do treino.");
+            return;
+        }
+        const blocos = document.querySelectorAll('.card-content-edit');
+        if (blocos.length === 0) {
+            alert('Por favor, adicione pelo menos um exercício antes de salvar.');
+            return;
+        }
+
+        //btnSave.disabled = true;
+        //btnSave.textContent = "Salvando...";
+        
+        try {
+            const workoutId = generateWorkoutId(currentUser, txtDate.value);
+            const workoutDate = txtDate.value;
+            const rotina = [];
+
+            blocos.forEach(bloco => {
+            const titulo = bloco.querySelector('.exercise-input').value;
+            const numSeries = parseInt(bloco.querySelector('.num-series-input').value);
+            const series = Array.from(bloco.querySelectorAll('.series-inputs-container input')).map(input => input.value);
+
+            if (titulo && numSeries && series.length > 0) {
+                rotina.push({ titulo, numSeries, series });
+                console.log(`Adicionado exercício: ${titulo}, Séries: ${numSeries}, Detalhes: ${series}`);
+                console.log(rotina);
+            }
+            });
+
+            if (rotina.length === 0) {
+                alert('Nenhum exercício válido foi adicionado. Verifique os campos e tente novamente.');
+                return;
+            }
+
+                        // Monta o objeto final do treino
+            const workoutData = {
+                date: workoutDate,
+                performedExercises: rotina
+            };
+
+            // Cria a referência para o novo documento de treino
+            const workoutDocRef = doc(db, "usuarios", currentUser.uid, "workouts", workoutId);
+            
+            // Salva os dados no Firestore
+            await setDoc(workoutDocRef, workoutData);
+
+            console.log("Rotina salva:", rotina);
+            alert('Rotina salva com sucesso!');
+        } catch (error) {
+            console.error("Erro ao salvar a rotina:", error);
+            alert("Ocorreu um erro ao salvar o treino. Tente novamente.");
+        }
+    });
+
 }
+
 
 // Inicia a aplicação
 main();
