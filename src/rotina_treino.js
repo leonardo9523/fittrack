@@ -40,8 +40,7 @@ async function main() {
     }
 
     // --- LÓGICA DE CRIAÇÃO DO BLOCO DE EXERCÍCIO ---
-    function criarNovoBlocoDeExercicio() {
-        // Cria o elemento principal do card
+    function criarNovoBlocoDeExercicio() {        // Cria o elemento principal do card
         const cardDiv = document.createElement('div');
         cardDiv.className = 'card rounded-4 p-4 shadow text-center mb-3';
         cardDiv.style.backgroundColor = '#212529';
@@ -109,11 +108,11 @@ async function main() {
                 seriesInputsContainer.innerHTML += `
                     <div class="mb-2">
                         <label class="form-label text-light">Carga da série ${i}</label>
-                        <input type="number" class="form-control bg-secondary text-light" placeholder="Ex: 20kg">
+                        <input type="number" class="form-control bg-secondary text-light weight-input" placeholder="Ex: 20kg">
                     </div>
                     <div class="mb-2">
                         <label class="form-label text-light">Número de repetições da série ${i}</label>
-                        <input type="number" class="form-control bg-secondary text-light" placeholder="Ex: 8 repetições">
+                        <input type="number" class="form-control bg-secondary text-light reps-input" placeholder="Ex: 8 repetições">
                     </div>
                 `;
             }
@@ -149,7 +148,8 @@ async function main() {
     const btnAddExercise = document.getElementById("btnAddExercise");
 
     btnAddExercise.addEventListener("click", () => {
-        const novoBloco = criarNovoBlocoDeExercicio();
+        const numExercicios = exercicioContainer.children.length;
+        const novoBloco = criarNovoBlocoDeExercicio(numExercicios + 1);
         exercicioContainer.appendChild(novoBloco);
     });
     
@@ -161,13 +161,13 @@ async function main() {
     });
     
     // Inicializa a página com um bloco já criado
-    exercicioContainer.appendChild(criarNovoBlocoDeExercicio());
+    exercicioContainer.appendChild(criarNovoBlocoDeExercicio(1));
 
-    function generateWorkoutId(user, dateStr) {
-        if (!user || !dateStr) return null;
-        // Formato YYYY-MM-DD -> YYYYMMDD
-        const formattedDate = dateStr.replace(/-/g, '');
-        return `${user.uid}-${formattedDate}-workout`;
+    function generateWorkoutId(dateStr) {
+        if (!dateStr) return null;
+        const formattedDate = dateStr.replace(/\//g, '');
+        console.log(`${formattedDate}-workout`);
+        return `${formattedDate}-workout`;
     }
         
 
@@ -193,20 +193,34 @@ async function main() {
         //btnSave.textContent = "Salvando...";
         
         try {
-            const workoutId = generateWorkoutId(currentUser, txtDate.value);
+            const workoutId = generateWorkoutId(txtDate.value);
             const workoutDate = txtDate.value;
             const rotina = [];
+            let orderCounter = 0;
 
             blocos.forEach(bloco => {
-            const titulo = bloco.querySelector('.exercise-input').value;
-            const numSeries = parseInt(bloco.querySelector('.num-series-input').value);
-            const series = Array.from(bloco.querySelectorAll('.series-inputs-container input')).map(input => input.value);
+                const titulo = bloco.querySelector('.exercise-input').value;
 
-            if (titulo && numSeries && series.length > 0) {
-                rotina.push({ titulo, numSeries, series });
-                console.log(`Adicionado exercício: ${titulo}, Séries: ${numSeries}, Detalhes: ${series}`);
-                console.log(rotina);
-            }
+                const sets = [];
+                const seriesInputs = bloco.querySelectorAll('.series-inputs-container');
+                seriesInputs.forEach(serieRow => {
+                    const weight = parseFloat(serieRow.querySelector('.weight-input').value) || 0;
+                    const reps = parseInt(serieRow.querySelector('.reps-input').value) || 0;
+                    if (reps > 0) { // Adiciona a série apenas se tiver repetições
+                        sets.push({ weight, reps });
+                    }
+                });
+                
+                //melhor colocar order como um contador aqui, para garantir que cada bloco tenha uma ordem única
+                if (sets.length > 0) {
+                    orderCounter++;
+                    console.log(orderCounter, titulo, sets);
+                    rotina.push({
+                        order: parseInt(orderCounter),
+                        titulo: titulo,
+                        sets: sets
+                    });
+                }
             });
 
             if (rotina.length === 0) {
@@ -214,7 +228,7 @@ async function main() {
                 return;
             }
 
-                        // Monta o objeto final do treino
+            // Monta o objeto final do treino
             const workoutData = {
                 date: workoutDate,
                 performedExercises: rotina

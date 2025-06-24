@@ -70,14 +70,19 @@
             </div>
             <script>
                 const datepicker = new tempusDominus.TempusDominus(document.getElementById('datepicker'), {
+                    
                     display: {
-                    components: {
-                        calendar: true,
-                        date: true,
-                        month: true,
-                        year: true,
-                        decades: true
-                    }
+                        components: {
+                            calendar: true,
+                            date: true,
+                            month: true,
+                            year: true,
+                            decades: true
+                        }
+                    },
+                    localization: {
+                        locale: 'pt-BR',
+                        format: 'dd/MM/yyyy',
                     }
                 });
             </script>
