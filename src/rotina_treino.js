@@ -250,6 +250,5 @@ async function main() {
 
 }
 
-
 // Inicia a aplicação
 main();
