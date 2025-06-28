@@ -165,20 +165,31 @@ async function main() {
 
     function generateWorkoutId(dateStr) {
         if (!dateStr) return null;
-        const formattedDate = dateStr.replace(/\//g, '');
-        console.log(`${formattedDate}-workout`);
-        return `${formattedDate}-workout`;
+        return dateStr.replace(/\D/g, '');
     }
         
 
     const btnSave = document.getElementById("btnSave");
     const txtDate = document.getElementById("textDate");
+
+    function parseCustomDate(dateString) {
+        // O formato esperado é "dd/MM/yyyy HH:mm"
+        const [datePart, timePart] = dateString.split(' ');
+        const [day, month, year] = datePart.split('/');
+        const [hours, minutes] = timePart.split(':');
+
+        // Retorna um objeto Date válido.
+        // Lembre-se que os meses em JavaScript são baseados em zero (0 = Janeiro, 1 = Fevereiro, etc.)
+        return new Date(year, month - 1, day, hours, minutes);
+    }
+
     btnSave.addEventListener("click", async () => {
 
         if (!currentUser) {
             alert("Erro: Usuário não está logado. Por favor, recarregue a página.");
             return;
         }
+        const workoutDateString = txtDate.value;
         if (!txtDate.value) {
             alert("Por favor, selecione a data do treino.");
             return;
@@ -193,8 +204,13 @@ async function main() {
         //btnSave.textContent = "Salvando...";
         
         try {
+            // ### PASSO 1: Converter a string para um objeto Date do JavaScript ###
+            const jsDate = parseCustomDate(workoutDateString);
+
+            // ### PASSO 2: Converter o objeto Date para um Timestamp do Firestore ###
+            const firestoreTimestamp = Timestamp.fromDate(jsDate);
+
             const workoutId = generateWorkoutId(txtDate.value);
-            const workoutDate = txtDate.value;
             const rotina = [];
             let orderCounter = 0;
 
@@ -202,16 +218,31 @@ async function main() {
                 const titulo = bloco.querySelector('.exercise-input').value;
 
                 const sets = [];
-                const seriesInputs = bloco.querySelectorAll('.series-inputs-container');
-                seriesInputs.forEach(serieRow => {
-                    const weight = parseFloat(serieRow.querySelector('.weight-input').value) || 0;
-                    const reps = parseInt(serieRow.querySelector('.reps-input').value) || 0;
-                    if (reps > 0) { // Adiciona a série apenas se tiver repetições
-                        sets.push({ weight, reps });
+                const seriesContainer = bloco.querySelector('.series-inputs-container');
+                if (seriesContainer) {
+                    const allSeriesDivs = seriesContainer.children;
+                    for (let i = 0; i < allSeriesDivs.length; i += 2) {
+                        const weightDiv = allSeriesDivs[i];
+                        const repsDiv = allSeriesDivs[i + 1];
+
+                        // 3. Verifique se o par de divs existe para evitar erros.
+                        if (weightDiv && repsDiv) {
+                            const weightInput = weightDiv.querySelector('.weight-input');
+                            const repsInput = repsDiv.querySelector('.reps-input');
+
+                            // 4. Obtenha os valores e adicione ao array 'sets'.
+                            if (weightInput && repsInput) {
+                                const weight = parseFloat(weightInput.value) || 0;
+                                const reps = parseInt(repsInput.value) || 0;
+
+                                if (reps > 0) { // Adiciona a série apenas se tiver repetições
+                                    sets.push({ weight, reps });
+                                }
+                            }
+                        }
                     }
-                });
+                }
                 
-                //melhor colocar order como um contador aqui, para garantir que cada bloco tenha uma ordem única
                 if (sets.length > 0) {
                     orderCounter++;
                     console.log(orderCounter, titulo, sets);
@@ -230,7 +261,7 @@ async function main() {
 
             // Monta o objeto final do treino
             const workoutData = {
-                date: workoutDate,
+                date: firestoreTimestamp,
                 performedExercises: rotina
             };
 
@@ -241,7 +272,7 @@ async function main() {
             await setDoc(workoutDocRef, workoutData);
 
             console.log("Rotina salva:", rotina);
-            alert('Rotina salva com sucesso!');
+            window.location.href = `treino.html?workoutId=${workoutId}`;
         } catch (error) {
             console.error("Erro ao salvar a rotina:", error);
             alert("Ocorreu um erro ao salvar o treino. Tente novamente.");
