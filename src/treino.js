@@ -9,6 +9,8 @@ async function main() {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             userEmailLabel.textContent = user.email;
+                console.log("Iniciando a página de treino...", user.uid);
+
 
             // 1. Pegar o ID do treino da URL
             const urlParams = new URLSearchParams(window.location.search);
