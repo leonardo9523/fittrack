@@ -47,7 +47,8 @@ body > .container {
 }
 
 .card h3,
-.card h2 {
+.card h2,
+.card p {
   color: #fff;
 }
 

@@ -4,7 +4,7 @@ import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/
 
 async function main() {
     const userEmailLabel = document.getElementById("lblUserEmail");
-    const historicoContainer = document.getElementById("historicoContainer"); // Container principal para o conteúdo
+    const historicoContainer = document.getElementById("historicoContainer");
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -69,4 +69,26 @@ const btnRegistrarNovoTreino = document.getElementById("btnRegistrarNovoTreino")
 btnRegistrarNovoTreino.addEventListener("click", () => {
     // Redireciona para a página de registro de treino
     window.location.href = "rotina_treino.html"; // ou o caminho correto para sua página de registro de treino
+});
+
+const btnHistorico = document.getElementById("btnHistorico");
+
+btnHistorico.addEventListener("click", () => {
+    // Redireciona para a página de registro de treino
+    window.location.href = "historico.html"; // ou o caminho correto para sua página de registro de treino
+});
+
+const userLogout = document.getElementById("lblLogout");
+
+userLogout.addEventListener("click", (event) => {
+    event.preventDefault();
+    signOut(auth).then(() => {
+        // Logout bem-sucedido.
+        console.log("Usuário deslogado com sucesso.");
+        // O onAuthStateChanged vai detectar a mudança e redirecionar automaticamente.
+    }).catch((error) => { 
+        // Ocorreu um erro no logout.
+        console.error("Erro ao fazer logout:", error);
+        alert("Erro ao tentar sair.");
+    });
 });
