@@ -146,11 +146,18 @@ async function main() {
     // --- EVENTO PRINCIPAL PARA ADICIONAR UM NOVO BLOCO ---
     const exercicioContainer = document.getElementById("exercicioContainer");
     const btnAddExercise = document.getElementById("btnAddExercise");
+    const switchFavorite = document.getElementById("switchFavorite");
+    const divTitleFavorite = document.getElementById("divTitleFavorite");
 
     btnAddExercise.addEventListener("click", () => {
         const numExercicios = exercicioContainer.children.length;
         const novoBloco = criarNovoBlocoDeExercicio(numExercicios + 1);
         exercicioContainer.appendChild(novoBloco);
+    });
+
+    switchFavorite.addEventListener("change", () => {
+        // Se o switch estiver marcado, mostra a div; se não, esconde
+        divTitleFavorite.hidden = !switchFavorite.checked;
     });
     
     // Fecha todas as listas de autocomplete ao clicar fora
@@ -272,6 +279,17 @@ async function main() {
             await setDoc(workoutDocRef, workoutData);
 
             console.log("Rotina salva:", rotina);
+
+            if (document.getElementById("switchFavorite").checked) {
+                const favoriteWorkoutTitle = document.getElementById("favoriteWorkoutTitle").value;
+                const favoriteWorkoutData = {
+                    title: favoriteWorkoutTitle,
+                    performedExercises: rotina
+                }
+                const favoriteWorkoutDocRef = doc(db, "usuarios", currentUser.uid, "favoriteWorkouts", favoriteWorkoutTitle);
+                await setDoc(favoriteWorkoutDocRef, favoriteWorkoutData);
+                console.log("Treino favorito salvo:", favoriteWorkoutTitle);
+            }
             window.location.href = `treino.html?workoutId=${workoutId}`;
         } catch (error) {
             console.error("Erro ao salvar a rotina:", error);

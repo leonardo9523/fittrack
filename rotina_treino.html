@@ -56,6 +56,14 @@
         </div>
         <form>
             <div class="mb-3 text-start">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="switchFavorite">
+                    <label class="form-label text-light" for="switchFavorite">Salvar como treino favorito?</label>
+                </div>
+                <div class="mb-3 visible" id="divTitleFavorite" hidden>
+                    <label class="form-label text-light">Título do treino</label>
+                    <input type="text" class="form-control bg-dark border-primary text-light" id="favoriteWorkoutTitle" placeholder="Ex: Treino A">
+                </div>
                 <label for="textDate" class="form-label text-light">Data do treino</label>
                 <div class="d-flex justify-content-between align-items-center gap-2">
                     <div class="input-group w-50" id="datepicker">
@@ -88,16 +96,16 @@
                 });
             </script>
             <div class="mb-3 text-start" id="exercicioContainer"></div>
-                <div class="container-fluid d-flex justify-content-between pt-4 pb-1 mt-2">
-                    <button type="button" class="btn btn-danger rounded-4 d-flex flex-column">
-                        <span class="material-symbols-outlined">cancel</span>
-                        <span class="dashboard-title text-light m-0">Cancelar</span>
-                    </button>
-                    <button type="button" class="btn btn-success rounded-4 d-flex flex-column" id="btnSave">
-                        <span class="material-symbols-outlined">save</span>
-                        <span class="dashboard-title text-light m-0">Salvar</span>
-                    </button>
-                </div>
+            <div class="container-fluid d-flex justify-content-between pt-4 pb-1 mt-2">
+                <button type="button" class="btn btn-danger rounded-4 d-flex flex-column">
+                    <span class="material-symbols-outlined">cancel</span>
+                    <span class="dashboard-title text-light m-0">Cancelar</span>
+                </button>
+                <button type="button" class="btn btn-success rounded-4 d-flex flex-column" id="btnSave">
+                    <span class="material-symbols-outlined">save</span>
+                    <span class="dashboard-title text-light m-0">Salvar</span>
+                </button>
+            </div>
         </form>
     </main>
     <footer class="bg-dark text-light mt-5 py-4">
