@@ -5,24 +5,35 @@ import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/
 async function main() {
     const userEmailLabel = document.getElementById("lblUserEmail");
     const historicoContainer = document.getElementById("historicoContainer");
+    const favoriteWorkoutsContainer = document.getElementById("favoriteWorkoutsContainer");
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             userEmailLabel.textContent = user.email;
             try {
-              const workoutsCollectionRef = collection(db, "usuarios", user.uid, "workouts");
-              const q = query(workoutsCollectionRef, orderBy("date", "desc"), limit(3));
-              const querySnapshot = await getDocs(q);
-              if (!querySnapshot.empty) {
-                querySnapshot.forEach((doc) => {
-                  const workoutData = doc.data();
-                  console.log("Workout encontrado:", workoutData);
-                });
+                const querySnapshot = await searchHistorico(user.uid);
+                if (!querySnapshot.empty) {
+                    querySnapshot.forEach((doc) => {
+                        const workoutData = doc.data();
+                        console.log("Workout encontrado:", workoutData);
+                    });
                   // 3. Renderizar os dados na página
                   displayWorkout(querySnapshot);
-              } else {
-                  historicoContainer.innerHTML = '<h1 class="text-light">Erro: Treino não encontrado.</h1>';
-                  console.log("Nenhum documento encontrado com o ID:", workoutId);
+                } else {
+                    historicoContainer.innerHTML = '<h1 class="text-light">Erro: Treino não encontrado.</h1>';
+                    console.log("Nenhum documento encontrado com o ID:", workoutId);
+                }
+                const querySnapshotFavoriteWorkouts = await searchFavoritos(user.uid);
+                if (!querySnapshotFavoriteWorkouts.empty) {
+                    querySnapshotFavoriteWorkouts.forEach((doc) => {
+                        const workoutData = doc.data();
+                        console.log("Favorite Workout encontrado:", workoutData);
+                    });
+                  // 3. Renderizar os dados na página
+                  displayFavoriteWorkouts(querySnapshotFavoriteWorkouts);
+                } else {
+                    favoriteWorkoutsContainer.innerHTML = '<h1 class="text-light">Erro: Treino não encontrado.</h1>';
+                    //console.log("Nenhum documento encontrado com o ID:", workoutId);
                 }
             } catch (error) {
                 historicoContainer.innerHTML = '<h1 class="text-light">Ocorreu um erro ao carregar o treino.</h1>';
@@ -34,12 +45,26 @@ async function main() {
         }
     });
 
+    async function searchHistorico(uid) {
+        const workoutsCollectionRef = collection(db, "usuarios", uid, "workouts");
+        const q = query(workoutsCollectionRef, orderBy("date", "desc"), limit(3));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot;
+    }
+
+    async function searchFavoritos(uid) {
+        const favoriteWorkoutsCollectionRef = collection(db, "usuarios", uid, "favoriteWorkouts");
+        const q = query(favoriteWorkoutsCollectionRef, orderBy("title", "desc"), limit(5));
+        const querySnapshotFavoriteWorkouts = await getDocs(q);
+        return querySnapshotFavoriteWorkouts;
+    }
+
     function displayWorkout(querySnapshot) {
       // Limpa o conteúdo placeholder do HTML
       historicoContainer.innerHTML = ''; 
 
       querySnapshot.forEach(doc => {
-        console.log("Workout encontrado:", doc.data());
+        console.log("Workout display:", doc.data());
         // Adiciona um título geral para o treino com a data formatada
         let workoutDate = doc.data().date.toDate(); // Converte Timestamp do Firestore para Date do JS
         let formattedDate = workoutDate.toLocaleString('pt-BR', {
@@ -58,6 +83,28 @@ async function main() {
           window.location.href = `treino.html?workoutId=${doc.id}`;
         });
         historicoContainer.appendChild(card);
+      });
+    }
+
+    function displayFavoriteWorkouts(querySnapshot) {
+      // Limpa o conteúdo placeholder do HTML
+      favoriteWorkoutsContainer.innerHTML = ''; 
+
+      querySnapshot.forEach(doc => {
+        console.log("Favorite Workout display:", doc.data());
+        const card = document.createElement('div');
+        card.className = 'col-sm';
+        card.innerHTML = `
+            <div class="card card-animado rounded-4 p-4 shadow text-center" style="background-color: #212529;">
+                <span class="material-symbols-outlined">star</span>
+                <h2 class="dashboard-title">${doc.data().title}</h2>
+            </div>
+        `;
+        card.addEventListener('click', () => {
+                        // Redireciona para a página de detalhes, passando o ID na URL
+          window.location.href = `treino.html?workoutId=${doc.id}`;
+        });
+        favoriteWorkoutsContainer.appendChild(card);
       });
     }
 }
