@@ -1,4 +1,4 @@
-import { doc, getDocs, query, collection, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
+import { doc, getDocs, query, collection, orderBy, limit, getDoc } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
 import { auth, db } from './firebase-config.js'; 
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
 
@@ -11,29 +11,21 @@ async function main() {
         if (user) {
             userEmailLabel.textContent = user.email;
             try {
-                const querySnapshot = await searchHistorico(user.uid);
-                if (!querySnapshot.empty) {
-                    querySnapshot.forEach((doc) => {
-                        const workoutData = doc.data();
-                        console.log("Workout encontrado:", workoutData);
-                    });
-                  // 3. Renderizar os dados na página
-                  displayWorkout(querySnapshot);
+                const [historicoSnapshot, favoritosSnapshot] = await Promise.all([
+                    searchHistorico(user.uid),
+                    searchFavoritos(user.uid)
+                ]);
+
+                if (!historicoSnapshot.empty) {
+                    displayWorkout(historicoSnapshot);
                 } else {
-                    historicoContainer.innerHTML = '<h1 class="text-light">Erro: Treino não encontrado.</h1>';
-                    console.log("Nenhum documento encontrado com o ID:", workoutId);
+                    historicoContainer.innerHTML = '<p class="text-light text-center">Nenhum treino no seu histórico recente.</p>';
                 }
-                const querySnapshotFavoriteWorkouts = await searchFavoritos(user.uid);
-                if (!querySnapshotFavoriteWorkouts.empty) {
-                    querySnapshotFavoriteWorkouts.forEach((doc) => {
-                        const workoutData = doc.data();
-                        console.log("Favorite Workout encontrado:", workoutData);
-                    });
-                  // 3. Renderizar os dados na página
-                  displayFavoriteWorkouts(querySnapshotFavoriteWorkouts);
+
+                if (!favoritosSnapshot.empty) {
+                    displayFavoriteWorkouts(favoritosSnapshot);
                 } else {
-                    favoriteWorkoutsContainer.innerHTML = '<h1 class="text-light">Erro: Treino não encontrado.</h1>';
-                    //console.log("Nenhum documento encontrado com o ID:", workoutId);
+                    favoriteWorkoutsContainer.innerHTML = '<p class="text-light text-center">Você ainda não salvou treinos favoritos.</p>';
                 }
             } catch (error) {
                 historicoContainer.innerHTML = '<h1 class="text-light">Ocorreu um erro ao carregar o treino.</h1>';
@@ -80,7 +72,7 @@ async function main() {
         `;
         card.addEventListener('click', () => {
                         // Redireciona para a página de detalhes, passando o ID na URL
-          window.location.href = `treino.html?workoutId=${doc.id}`;
+          window.location.href = `rotina_treino.html?workoutId=${doc.id}`;
         });
         historicoContainer.appendChild(card);
       });
@@ -91,18 +83,19 @@ async function main() {
       favoriteWorkoutsContainer.innerHTML = ''; 
 
       querySnapshot.forEach(doc => {
+        const favoriteWorkoutTitle = doc.data().title;
         console.log("Favorite Workout display:", doc.data());
         const card = document.createElement('div');
         card.className = 'col-sm';
         card.innerHTML = `
             <div class="card card-animado rounded-4 p-4 shadow text-center" style="background-color: #212529;">
                 <span class="material-symbols-outlined">star</span>
-                <h2 class="dashboard-title">${doc.data().title}</h2>
+                <h2 class="dashboard-title">${favoriteWorkoutTitle}</h2>
             </div>
         `;
         card.addEventListener('click', () => {
                         // Redireciona para a página de detalhes, passando o ID na URL
-          window.location.href = `treino.html?workoutId=${doc.id}`;
+          window.location.href = `rotina_treino.html?title=${favoriteWorkoutTitle}`;
         });
         favoriteWorkoutsContainer.appendChild(card);
       });

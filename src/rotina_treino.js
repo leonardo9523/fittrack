@@ -1,5 +1,5 @@
 import { db, auth } from './firebase-config.js';
-import { collection, getDocs, query, doc, setDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
+import { collection, getDocs, query, doc, setDoc, Timestamp, getDoc } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
 
 
@@ -8,6 +8,10 @@ async function main() {
 
     const userEmail = document.getElementById("lblUserEmail");
     let currentUser = null;
+    const switchFavorite = document.getElementById("switchFavorite");
+    const divSwitchFavorite = document.getElementById("divSwitchFavorite");
+    const exercicioContainer = document.getElementById("exercicioContainer");
+
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -16,6 +20,21 @@ async function main() {
         console.log("Usuário logado:", user);
         // Agora você pode pegar as informações dele, como o email
         userEmail.textContent = user.email;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const title = urlParams.get('title');
+        console.log("Título do treino favorito:", title);
+
+        if (title) {
+            criarBlocosDeExercicioTreinoFavorito(title, user.uid);
+            divSwitchFavorite.hidden = true;
+        }
+        else {
+            console.log("Nenhum título de treino favorito fornecido.");
+            // Se não houver título, cria um bloco de exercício padrão
+            //const exercicioContainer = document.getElementById("exercicioContainer");
+            exercicioContainer.appendChild(criarNovoBlocoDeExercicio());
+        }
     
       } else {
         // O usuário não está logado.
@@ -39,8 +58,31 @@ async function main() {
         return; // Interrompe a execução se os dados essenciais não puderem ser carregados
     }
 
+    async function criarBlocosDeExercicioTreinoFavorito(title, uid) {
+        const favoriteWorkoutsDocRef = doc(db, "usuarios", uid, "favoriteWorkouts", title);
+        const favoriteWorkoutSnap = await getDoc(favoriteWorkoutsDocRef);
+        console.log("Dados do treino favorito:", favoriteWorkoutSnap.data());
+
+        if (favoriteWorkoutSnap.exists()) {
+            const favoriteWorkoutData = favoriteWorkoutSnap.data();
+
+            exercicioContainer.innerHTML = ''; 
+
+            favoriteWorkoutData.exercises.forEach((exercise) => {
+                console.log("sua mãe", exercise.titulo);
+                const novoBloco = criarNovoBlocoDeExercicio();
+                novoBloco.querySelector('.exercise-input').value = exercise.titulo;
+                novoBloco.querySelector('.exercise-summary-title').textContent = exercise.titulo;
+                exercicioContainer.appendChild(novoBloco);
+            });
+            return;
+        }
+        
+    }
+
     // --- LÓGICA DE CRIAÇÃO DO BLOCO DE EXERCÍCIO ---
-    function criarNovoBlocoDeExercicio() {        // Cria o elemento principal do card
+    function criarNovoBlocoDeExercicio() { 
+    console.log("abluble");    // Cria o elemento principal do card
         const cardDiv = document.createElement('div');
         cardDiv.className = 'card rounded-4 p-4 shadow text-center mb-3';
         cardDiv.style.backgroundColor = '#212529';
@@ -143,10 +185,7 @@ async function main() {
         return cardDiv;
     }
 
-    // --- EVENTO PRINCIPAL PARA ADICIONAR UM NOVO BLOCO ---
-    const exercicioContainer = document.getElementById("exercicioContainer");
     const btnAddExercise = document.getElementById("btnAddExercise");
-    const switchFavorite = document.getElementById("switchFavorite");
     const divTitleFavorite = document.getElementById("divTitleFavorite");
 
     btnAddExercise.addEventListener("click", () => {
@@ -166,9 +205,6 @@ async function main() {
             document.querySelectorAll('.autocomplete-list').forEach(list => list.innerHTML = '');
         }
     });
-    
-    // Inicializa a página com um bloco já criado
-    exercicioContainer.appendChild(criarNovoBlocoDeExercicio(1));
 
     function generateWorkoutId(dateStr) {
         if (!dateStr) return null;
@@ -219,6 +255,7 @@ async function main() {
 
             const workoutId = generateWorkoutId(txtDate.value);
             const rotina = [];
+            const favoriteExercises = [];
             let orderCounter = 0;
 
             blocos.forEach(bloco => {
@@ -280,11 +317,18 @@ async function main() {
 
             console.log("Rotina salva:", rotina);
 
-            if (document.getElementById("switchFavorite").checked) {
+            if (switchFavorite.checked) {
                 const favoriteWorkoutTitle = document.getElementById("favoriteWorkoutTitle").value;
+                const favoriteExercises = [];
+                rotina.forEach(exercise => {
+                    favoriteExercises.push({
+                        titulo: exercise.titulo,
+                        order: exercise.order
+                    });
+                });
                 const favoriteWorkoutData = {
                     title: favoriteWorkoutTitle,
-                    performedExercises: rotina
+                    exercises: favoriteExercises
                 }
                 const favoriteWorkoutDocRef = doc(db, "usuarios", currentUser.uid, "favoriteWorkouts", favoriteWorkoutTitle);
                 await setDoc(favoriteWorkoutDocRef, favoriteWorkoutData);
