@@ -1,4 +1,4 @@
-import { doc, getDocs, query, collection, orderBy } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
+import { getDocs, query, collection, orderBy } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
 import { auth, db } from './firebase-config.js'; 
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
 
@@ -51,12 +51,18 @@ async function main() {
                 totalDeSeries += exercicio.sets.length;
             });
 
+            const workoutDate = doc.data().date.toDate(); // Converte Timestamp do Firestore para Date do JS
+            const formattedDate = workoutDate.toLocaleString('pt-BR', {
+                dateStyle: 'short',
+                timeStyle: 'short'
+            });
+
             console.log(`Total de Séries: ${totalDeSeries}`);
             const card = document.createElement('div');
             card.className = 'col-sm';
             card.innerHTML = `
                 <div class="card card-animado rounded-4 p-4 m-4 shadow text-center" style="background-color: #212529;">
-                    <h2>Treino</h2>
+                    <h2>Treino de ${formattedDate}</h2>
                     <p class="text-light m-0">Quantidade de exercícios: <strong>${totalDeExercicios}</strong></p>
                     <p class="text-light m-0">Quantidade de séries: <strong>${totalDeSeries}</strong></p>
                 </div>

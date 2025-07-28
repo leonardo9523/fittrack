@@ -1,5 +1,5 @@
 import { db, auth } from './firebase-config.js';
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
+import { doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
 
 async function main() {
@@ -30,7 +30,7 @@ async function main() {
                 if (workoutSnap.exists()) {
                     const workoutData = workoutSnap.data();
                     // 3. Renderizar os dados na página
-                    displayWorkout(workoutData);
+                    displayWorkout(workoutData, user, workoutId);
                 } else {
                     mainContainer.innerHTML = '<h1 class="text-light">Erro: Treino não encontrado.</h1>';
                     console.log("Nenhum documento encontrado com o ID:", workoutId);
@@ -45,7 +45,7 @@ async function main() {
         }
     });
 
-    function displayWorkout(workoutData) {
+    function displayWorkout(workoutData, user, workoutId) {
         // Limpa o conteúdo placeholder do HTML
         mainContainer.innerHTML = ''; 
 
@@ -85,6 +85,41 @@ async function main() {
                 </div>
             `;
             mainContainer.innerHTML += cardHtml;
+        });
+        const deleteDiv = `
+            <div class="container-fluid d-flex justify-content-end pt-4 pb-1 mt-2">
+
+                <button type="button" class="btn btn-danger rounded-4 d-flex flex-column" id="btnDeleteWorkout">
+                    <span class="material-symbols-outlined">delete</span>
+                    <span class="dashboard-title text-light m-0">Deletar treino</span>
+                </button>
+            </div>
+        `;
+                // Adicionar futuramente a funcionalidade de compartilhar treino
+                // <button type="button" class="btn btn-success rounded-4 d-flex flex-column">
+                //     <span class="material-symbols-outlined">share</span>
+                //     <span class="dashboard-title text-light m-0">Compartilhar treino</span>
+                // </button>
+
+        mainContainer.innerHTML += deleteDiv;
+        console.log("Workout encontrado:", workoutData);
+        const btnDeleteWorkout = document.querySelector('#btnDeleteWorkout');
+
+        btnDeleteWorkout.addEventListener('click', async () => {
+                        console.log("Confirmação de exclusão:", user.uid, workoutId);
+            const confirmDelete = confirm("Você tem certeza que deseja deletar este treino?");
+
+            if (confirmDelete) {
+                try {
+                    const workoutDocRef = doc(db, "usuarios", user.uid, "workouts", workoutId);
+                    await deleteDoc(workoutDocRef);
+                    alert("Treino deletado com sucesso!");
+                    window.location.href = "historico.html"; // Redireciona para a página de histórico
+                } catch (error) {
+                    console.error("Erro ao deletar treino:", error);
+                    alert("Ocorreu um erro ao tentar deletar o treino.");
+                }
+            }
         });
     }
 }
