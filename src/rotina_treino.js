@@ -69,7 +69,6 @@ async function main() {
             exercicioContainer.innerHTML = ''; 
 
             favoriteWorkoutData.exercises.forEach((exercise) => {
-                console.log("sua mãe", exercise.titulo);
                 const novoBloco = criarNovoBlocoDeExercicio();
                 novoBloco.querySelector('.exercise-input').value = exercise.titulo;
                 novoBloco.querySelector('.exercise-summary-title').textContent = exercise.titulo;

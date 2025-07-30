@@ -1,5 +1,5 @@
 import { db, auth } from './firebase-config.js';
-import { doc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
+import { doc, getDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
 
 async function main() {
@@ -75,10 +75,13 @@ async function main() {
             });
 
             const cardHtml = `
-                <div class="card rounded-4 p-3 mt-3 shadow" style="background-color: #212529;">
+                <div class="card rounded-4 p-3 mt-3 shadow" data-exercise-title="${exercise.titulo}" style="background-color: #212529;">
                     <div class="d-flex justify-content-between align-items-center">
                         <h2 class="dashboard-title text-light mb-0">${exercise.titulo}</h2>
-                        <button type="button" class="btn btn-sm"><span class="material-symbols-outlined">edit</span></button>
+                        <div class="d-flex align-items-center">
+                            <button type="button" class="btn btn-sm"><span class="material-symbols-outlined">edit</span></button>
+                            <button type="button" class="btn btn-sm btnDeleteExercise"><span class="material-symbols-outlined">delete</span></button>
+                        </div>
                     </div>
                     <hr class="text-secondary">
                     ${setsHtml}
@@ -88,7 +91,6 @@ async function main() {
         });
         const deleteDiv = `
             <div class="container-fluid d-flex justify-content-end pt-4 pb-1 mt-2">
-
                 <button type="button" class="btn btn-danger rounded-4 d-flex flex-column" id="btnDeleteWorkout">
                     <span class="material-symbols-outlined">delete</span>
                     <span class="dashboard-title text-light m-0">Deletar treino</span>
@@ -103,10 +105,45 @@ async function main() {
 
         mainContainer.innerHTML += deleteDiv;
         console.log("Workout encontrado:", workoutData);
+        const btnDeleteExercise = document.querySelectorAll('.btnDeleteExercise');
+        btnDeleteExercise.forEach(button => {
+            button.addEventListener('click', async (event) => {
+                const exerciseCard = event.target.closest('.card');
+                const titleToDelete = exerciseCard.getAttribute('data-exercise-title');
+                console.log("Exercício a ser deletado:", titleToDelete);
+                const confirmDelete = confirm(`Você tem certeza que deseja deletar o exercício "${titleToDelete}"?`);
+
+                if (confirmDelete) {
+                    // 1. Cria um novo array sem o exercício a ser deletado
+                    const updatedExercises = workoutData.performedExercises.filter(ex => ex.titulo !== titleToDelete);
+
+                    // 2. Pega a referência do documento do treino
+                    const workoutDocRef = doc(db, "usuarios", user.uid, "workouts", workoutId);
+
+                    try {
+                        // 3. Atualiza o campo 'performedExercises' no Firestore
+                        await updateDoc(workoutDocRef, {
+                            performedExercises: updatedExercises
+                        });
+
+                        // 4. Remove o card do DOM após o sucesso
+                        exerciseCard.remove();
+                        // Atualiza os dados locais para consistência caso outra ação seja feita na página
+                        workoutData.performedExercises = updatedExercises; 
+                        alert("Exercício removido com sucesso!");
+
+                    } catch (error) {
+                        console.error("Erro ao remover exercício:", error);
+                        alert("Ocorreu um erro ao remover o exercício.");
+                    }
+                }
+            });
+        });
+
         const btnDeleteWorkout = document.querySelector('#btnDeleteWorkout');
 
         btnDeleteWorkout.addEventListener('click', async () => {
-                        console.log("Confirmação de exclusão:", user.uid, workoutId);
+            console.log("Confirmação de exclusão:", user.uid, workoutId);
             const confirmDelete = confirm("Você tem certeza que deseja deletar este treino?");
 
             if (confirmDelete) {
