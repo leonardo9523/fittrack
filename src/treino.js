@@ -64,7 +64,10 @@ async function main() {
         // Itera sobre cada exercício e cria um card para ele
         workoutData.performedExercises.forEach(exercise => {
             let setsHtml = '';
+            let setsHtmlEdit = '';
+            let totalDeSeries = 0;
             exercise.sets.forEach((set, index) => {
+                console.log("Set encontrado:", set);
                 setsHtml += `
                     <div class="mb-2 text-start">
                         <h4 class="text-light mb-1">Série ${index + 1}</h4>
@@ -72,6 +75,17 @@ async function main() {
                         <p class="text-light m-0">Carga: <strong>${set.weight} kg</strong></p>
                     </div>
                 `;
+                setsHtmlEdit += `
+                    <div class="mb-2">
+                        <label class="form-label text-light">Carga da série ${index + 1}</label>
+                        <input type="number" class="form-control bg-secondary text-light weight-input" placeholder="Ex: 20kg" value="${set.weight}">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label text-light">Número de repetições da série ${index + 1}</label>
+                        <input type="number" class="form-control bg-secondary text-light reps-input" placeholder="Ex: 8 repetições" value="${set.reps}">
+                    </div>
+                `;
+                totalDeSeries++;
             });
 
             const cardHtml = `
@@ -79,15 +93,31 @@ async function main() {
                     <div class="d-flex justify-content-between align-items-center">
                         <h2 class="dashboard-title text-light mb-0">${exercise.titulo}</h2>
                         <div class="d-flex align-items-center">
-                            <button type="button" class="btn btn-sm"><span class="material-symbols-outlined">edit</span></button>
+                            <button type="button" class="btn btn-sm btnEditExercise"><span class="material-symbols-outlined">edit</span></button>
                             <button type="button" class="btn btn-sm btnDeleteExercise"><span class="material-symbols-outlined">delete</span></button>
                         </div>
                     </div>
                     <hr class="text-secondary">
                     ${setsHtml}
                 </div>
+                <div class="card rounded-4 p-3 mt-3 shadow" data-exercise-title="${exercise.titulo + "edit"}" style="background-color: #212529;" >
+                    <div>
+                        <label class="form-label text-light">Buscar exercício</label>
+                        <input type="text" class="form-control bg-dark border-secondary text-light exercise-input" placeholder="Digite o nome do exercício" value="${exercise.titulo}">
+                    </div>
+                    <div class="mb-2 text-start">
+                        <label class="form-label text-light">Número de séries</label>
+                        <input type="number" class="form-control bg-dark border-secondary text-light num-series-input" min="1" max="10" placeholder="Ex: 4" value="${totalDeSeries}">
+                    </div>
+                    ${setsHtmlEdit}
+                    <div class="d-flex justify-content-between pt-4 pb-1 mt-2">
+                        <button type="button" class="btn btn-sm btnEditExercise btn-danger rounded-4 d-flex flex-column"><span class="material-symbols-outlined">cancel</span><span class="dashboard-title text-light m-0">Cancelar alterações</span></button>
+                        <button type="button" class="btn btn-sm btnEditExercise btn-success rounded-4 d-flex flex-column"><span class="material-symbols-outlined">save</span><span class="dashboard-title text-light m-0">Salvar alterações</span></button>
+                    </div>
+                </div>
             `;
             mainContainer.innerHTML += cardHtml;
+            //TODO: Terminar a edição de exercícios, lembrar de usar as funcionalidades do rotina_treino.js
         });
         const deleteDiv = `
             <div class="container-fluid d-flex justify-content-end pt-4 pb-1 mt-2">
@@ -105,6 +135,21 @@ async function main() {
 
         mainContainer.innerHTML += deleteDiv;
         console.log("Workout encontrado:", workoutData);
+
+        const btnEditExercise = document.querySelectorAll('.btnEditExercise');
+        btnEditExercise.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const exerciseEditCard = event.target.closest('.card');
+                const cardToEdit = exerciseEditCard.getAttribute('data-exercise-title');
+                //cardToEdit.classList.add('card-exercicio-edit');
+                const cardbla = document.querySelector(`div[data-exercise-title="${cardToEdit}edit"]`);
+                cardbla.hidden = false;
+                exerciseEditCard.hidden = true;
+                //TODO: Implementar a funcionalidade de edição de exercícios
+            });
+        });
+
+
         const btnDeleteExercise = document.querySelectorAll('.btnDeleteExercise');
         btnDeleteExercise.forEach(button => {
             button.addEventListener('click', async (event) => {

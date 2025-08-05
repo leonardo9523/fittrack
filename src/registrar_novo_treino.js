@@ -72,7 +72,7 @@ async function main() {
         `;
         card.addEventListener('click', () => {
                         // Redireciona para a página de detalhes, passando o ID na URL
-          window.location.href = `rotina_treino.html?workoutId=${doc.id}`;
+          window.location.href = `treino.html?workoutId=${doc.id}`;
         });
         historicoContainer.appendChild(card);
       });

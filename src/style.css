@@ -84,11 +84,11 @@ body > .container {
 }
 
 .card-exercicio-collapsed .card-content-edit {
-    display: none;
+  display: none;
 }
 
 .card-exercicio-collapsed .card-content-summary {
-    display: flex !important;
-    justify-content: space-between;
-    align-items: center;
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
 }

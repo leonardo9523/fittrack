@@ -81,7 +81,6 @@ async function main() {
 
     // --- LÓGICA DE CRIAÇÃO DO BLOCO DE EXERCÍCIO ---
     function criarNovoBlocoDeExercicio() { 
-    console.log("abluble");    // Cria o elemento principal do card
         const cardDiv = document.createElement('div');
         cardDiv.className = 'card rounded-4 p-4 shadow text-center mb-3';
         cardDiv.style.backgroundColor = '#212529';
