@@ -27,7 +27,7 @@ form.addEventListener("submit", async (e) => {
       console.log("Login realizado com sucesso!", user);
 
       // Redireciona para o dashboard
-      window.location.href = "dashboard.html";
+      window.location.href = "registrar_novo_treino.html";
     // ajuste conforme sua estrutura
   } catch (error) {
       // Tratamento de erros de login
