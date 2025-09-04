@@ -1,11 +1,25 @@
 import { auth } from './firebase-config.js'; 
-import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
+import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
 
 
 const form = document.querySelector("form");
 const emailInput = document.getElementById("txtEmailSignin");
 const passwordInput = document.getElementById("txtPasswordSignin");
 const messageElement = document.getElementById("signin-message"); 
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // O usuário está logado!
+    console.log("Usuário logado:", user);
+    // Agora você pode pegar as informações dele, como o email
+    // Redireciona para a página inicial do app para que o usuário não veja a tela de login novamente
+    window.location.href = "registrar_novo_treino.html";
+
+  } else {
+    // O usuário não está logado.
+    console.log("Nenhum usuário logado.");
+  }
+});
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
