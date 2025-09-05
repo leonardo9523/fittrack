@@ -146,16 +146,46 @@ async function main() {
 
             for (let i = 1; i <= num; i++) {
                 seriesInputsContainer.innerHTML += `
-                    <div class="mb-2">
-                        <label class="form-label text-light">Carga da série ${i}</label>
-                        <input type="number" class="form-control bg-secondary text-light weight-input" placeholder="Ex: 20kg">
+                    <div class="row g-2 mb-2 align-items-center">
+                    <div class="col-auto">
+                        <label class="form-label text-light m-0">Série ${i}:</label>
                     </div>
-                    <div class="mb-2">
-                        <label class="form-label text-light">Número de repetições da série ${i}</label>
-                        <input type="number" class="form-control bg-secondary text-light reps-input" placeholder="Ex: 8 repetições">
+                    <div class="col">
+                        <div class="input-group">
+                        <input type="number" class="form-control bg-secondary text-light weight-input" placeholder="Carga (kg)">
+                        <button class="btn btn-outline-light btn-sm btn-copy-weight" type="button" title="Aplicar para todos">
+                            <i class="bi bi-repeat"></i>
+                        </button>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="input-group">
+                        <input type="number" class="form-control bg-secondary text-light reps-input" placeholder="Reps">
+                        <button class="btn btn-outline-light btn-sm btn-copy-reps" type="button" title="Aplicar para todos">
+                            <i class="bi bi-repeat"></i>
+                        </button>
+                        </div>
+                    </div>
                     </div>
                 `;
             }
+            const btnCopyWeight = seriesInputsContainer.querySelector('.btn-copy-weight');
+
+            btnCopyWeight.addEventListener('click', () => {
+                const weightInputs = seriesInputsContainer.querySelectorAll('.weight-input'); // Seleciona todos os inputs de carga
+                if (weightInputs.length === 0) return; // Verifica se há inputs para evitar erros
+                const firstValue = weightInputs[0].value; // Pega o valor do primeiro input
+                weightInputs.forEach(input => input.value = firstValue); // Aplica o valor para todos os inputs
+            });
+
+            const btnCopyReps = seriesInputsContainer.querySelector('.btn-copy-reps');
+
+            btnCopyReps.addEventListener('click', () => {
+                const repsInputs = seriesInputsContainer.querySelectorAll('.reps-input'); // Seleciona todos os inputs de repetições
+                if (repsInputs.length === 0) return; // Verifica se há inputs para evitar erros
+                const firstValue = repsInputs[0].value; // Pega o valor do primeiro input
+                repsInputs.forEach(input => input.value = firstValue); // Aplica o valor para todos os inputs
+            });
         });
 
         // Lógica para o botão de remover
