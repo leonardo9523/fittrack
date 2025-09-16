@@ -169,6 +169,7 @@ async function main() {
                     </div>
                 `;
             }
+            //TODO: Deixar apenas a primeira linha
             const btnCopyWeight = seriesInputsContainer.querySelector('.btn-copy-weight');
 
             btnCopyWeight.addEventListener('click', () => {
@@ -292,28 +293,26 @@ async function main() {
                 const sets = [];
                 const seriesContainer = bloco.querySelector('.series-inputs-container');
                 if (seriesContainer) {
-                    const allSeriesDivs = seriesContainer.children;
-                    for (let i = 0; i < allSeriesDivs.length; i += 2) {
-                        const weightDiv = allSeriesDivs[i];
-                        const repsDiv = allSeriesDivs[i + 1];
+                    // Seleciona todas as divs de linha que representam uma série
+                    const allSeriesDivs = seriesContainer.querySelectorAll('.row');
 
-                        // 3. Verifique se o par de divs existe para evitar erros.
-                        if (weightDiv && repsDiv) {
-                            const weightInput = weightDiv.querySelector('.weight-input');
-                            const repsInput = repsDiv.querySelector('.reps-input');
+                    // Itera sobre CADA div de série
+                    allSeriesDivs.forEach(seriesDiv => {
+                        const weightInput = seriesDiv.querySelector('.weight-input');
+                        const repsInput = seriesDiv.querySelector('.reps-input');
 
-                            // 4. Obtenha os valores e adicione ao array 'sets'.
-                            if (weightInput && repsInput) {
-                                const weight = parseFloat(weightInput.value) || 0;
-                                const reps = parseInt(repsInput.value) || 0;
+                        if (weightInput && repsInput) {
+                            const weight = parseFloat(weightInput.value) || 0;
+                            const reps = parseInt(repsInput.value) || 0;
 
-                                if (reps > 0) { // Adiciona a série apenas se tiver repetições
-                                    sets.push({ weight, reps });
-                                }
+                            if (reps > 0) { // Adiciona a série apenas se tiver repetições
+                                sets.push({ weight, reps });
                             }
                         }
-                    }
+                    });
                 }
+
+                console.log("Exercício:", titulo, "Séries:", sets);
                 
                 if (sets.length > 0) {
                     orderCounter++;
@@ -362,7 +361,10 @@ async function main() {
                 await setDoc(favoriteWorkoutDocRef, favoriteWorkoutData);
                 console.log("Treino favorito salvo:", favoriteWorkoutTitle);
             }
+                setTimeout(() => {
             window.location.href = `treino.html?workoutId=${workoutId}`;
+
+    }, 7000); 
         } catch (error) {
             console.error("Erro ao salvar a rotina:", error);
             alert("Ocorreu um erro ao salvar o treino. Tente novamente.");
