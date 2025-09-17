@@ -11,6 +11,8 @@ async function main() {
     const switchFavorite = document.getElementById("switchFavorite");
     const divSwitchFavorite = document.getElementById("divSwitchFavorite");
     const exercicioContainer = document.getElementById("exercicioContainer");
+    const divButtonsFavorite = document.getElementById("divButtonsFavorite");
+    divButtonsFavorite.hidden = true;
 
 
     onAuthStateChanged(auth, (user) => {
@@ -28,6 +30,7 @@ async function main() {
         if (title) {
             criarBlocosDeExercicioTreinoFavorito(title, user.uid);
             divSwitchFavorite.hidden = true;
+            divButtonsFavorite.hidden = false;
         }
         else {
             console.log("Nenhum título de treino favorito fornecido.");
@@ -144,11 +147,10 @@ async function main() {
             seriesInputsContainer.innerHTML = '';
             if (isNaN(num) || num < 1 || num > 10) return;
 
-            for (let i = 1; i <= num; i++) {
-                seriesInputsContainer.innerHTML += `
-                    <div class="row g-2 mb-2 align-items-center">
+            seriesInputsContainer.innerHTML += `
+                <div class="row g-2 mb-2 align-items-center">
                     <div class="col-auto">
-                        <label class="form-label text-light m-0">Série ${i}:</label>
+                        <label class="form-label text-light m-0">Série 1:</label>
                     </div>
                     <div class="col">
                         <div class="input-group">
@@ -166,6 +168,25 @@ async function main() {
                         </button>
                         </div>
                     </div>
+                </div>
+            `;
+
+            for (let i = 2; i <= num; i++) {
+                seriesInputsContainer.innerHTML += `
+                    <div class="row g-2 mb-2 align-items-center">
+                        <div class="col-auto">
+                            <label class="form-label text-light m-0">Série ${i}:</label>
+                        </div>
+                        <div class="col">
+                            <div class="input-group">
+                            <input type="number" class="form-control bg-secondary text-light weight-input" placeholder="Carga (kg)">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="input-group">
+                            <input type="number" class="form-control bg-secondary text-light reps-input" placeholder="Reps">
+                            </div>
+                        </div>
                     </div>
                 `;
             }
@@ -288,41 +309,28 @@ async function main() {
 
             blocos.forEach(bloco => {
                 const titulo = bloco.querySelector('.exercise-input').value;
-
                 const sets = [];
-                const seriesContainer = bloco.querySelector('.series-inputs-container');
-                if (seriesContainer) {
-                    const allSeriesDivs = seriesContainer.children;
-                    for (let i = 0; i < allSeriesDivs.length; i += 2) {
-                        const weightDiv = allSeriesDivs[i];
-                        const repsDiv = allSeriesDivs[i + 1];
+                // Seleciona todos os inputs de peso e repetições dentro do bloco do exercício
+                const weightInputs = bloco.querySelectorAll('.weight-input');
+                const repsInputs = bloco.querySelectorAll('.reps-input');
 
-                        // 3. Verifique se o par de divs existe para evitar erros.
-                        if (weightDiv && repsDiv) {
-                            const weightInput = weightDiv.querySelector('.weight-input');
-                            const repsInput = repsDiv.querySelector('.reps-input');
+                // Itera sobre os inputs para obter os valores de cada série
+                for (let i = 0; i < weightInputs.length; i++) {
+                    const weight = parseFloat(weightInputs[i].value) || 0;
+                    const reps = parseInt(repsInputs[i].value) || 0;
 
-                            // 4. Obtenha os valores e adicione ao array 'sets'.
-                            if (weightInput && repsInput) {
-                                const weight = parseFloat(weightInput.value) || 0;
-                                const reps = parseInt(repsInput.value) || 0;
-
-                                if (reps > 0) { // Adiciona a série apenas se tiver repetições
-                                    sets.push({ weight, reps });
-                                }
-                            }
-                        }
+                    // Adiciona a série apenas se o número de repetições for maior que 0
+                    if (reps > 0) {
+                        sets.push({ weight, reps });
+                        console.log(`Série ${i + 1} adicionada:`, sets[sets.length - 1]);
                     }
                 }
                 
+                console.log("Exercício:", titulo, "Séries:", sets);
                 if (sets.length > 0) {
                     orderCounter++;
                     console.log(orderCounter, titulo, sets);
-                    rotina.push({
-                        order: parseInt(orderCounter),
-                        titulo: titulo,
-                        sets: sets
-                    });
+                    rotina.push({ order: parseInt(orderCounter), titulo: titulo, sets: sets });
                 }
             });
 
