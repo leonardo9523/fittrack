@@ -1,10 +1,12 @@
 import { db, auth } from './firebase-config.js';
-import { collection, getDocs, query, doc, setDoc, Timestamp, getDoc } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
+import { collection, getDocs, query, doc, setDoc, Timestamp, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
 
 
 // Função principal assíncrona para organizar o código
 async function main() {
+
+    //TODO: Adcionar cardio
 
     const userEmail = document.getElementById("lblUserEmail");
     let currentUser = null;
@@ -29,6 +31,7 @@ async function main() {
 
         if (title) {
             criarBlocosDeExercicioTreinoFavorito(title, user.uid);
+            initializeFavoriteButtons(title, user.uid);
             divSwitchFavorite.hidden = true;
             divButtonsFavorite.hidden = false;
         }
@@ -80,6 +83,25 @@ async function main() {
             return;
         }
         
+    }
+
+    async function initializeFavoriteButtons(title, uid) {
+        const btnDeleteFavorite = document.getElementById("btnDeleteFavorite");
+        btnDeleteFavorite.addEventListener("click", async () => {
+            const confirmDelete = confirm(`Você tem certeza que deseja remover esse treino favorito?`);
+            if (confirmDelete) {
+                try {
+                    await deleteDoc(doc(db, "usuarios", uid, "favoriteWorkouts", title));
+                    window.location.href = "registrar_novo_treino.html";
+                    alert("Treino favorito removido com sucesso!");
+                } catch (error) {
+                    console.error("Erro ao remover Treino favorito:", error);
+                    alert("Ocorreu um erro ao remover o Treino favorito.");
+                }
+            }
+        });
+        //TODO: Inicializar editar treino favorito
+        return;
     }
 
     // --- LÓGICA DE CRIAÇÃO DO BLOCO DE EXERCÍCIO ---
