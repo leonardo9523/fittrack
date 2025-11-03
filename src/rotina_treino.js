@@ -1,5 +1,5 @@
 import { db, auth } from './firebase-config.js';
-import { collection, getDocs, query, doc, setDoc, Timestamp, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
+import { collection, getDocs, query, doc, setDoc, Timestamp, getDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
 
 
@@ -14,7 +14,8 @@ async function main() {
     const divSwitchFavorite = document.getElementById("divSwitchFavorite");
     const exercicioContainer = document.getElementById("exercicioContainer");
     const divButtonsFavorite = document.getElementById("divButtonsFavorite");
-    divButtonsFavorite.hidden = true;
+    const switchEditFavorite = document.getElementById("switchEditFavorite");
+    let title = null;
 
 
     onAuthStateChanged(auth, (user) => {
@@ -26,7 +27,7 @@ async function main() {
         userEmail.textContent = user.email;
 
         const urlParams = new URLSearchParams(window.location.search);
-        const title = urlParams.get('title');
+        title = urlParams.get('title');
         console.log("Título do treino favorito:", title);
 
         if (title) {
@@ -100,7 +101,6 @@ async function main() {
                 }
             }
         });
-        //TODO: Inicializar editar treino favorito
         return;
     }
 
@@ -284,7 +284,15 @@ async function main() {
         
 
     const btnSave = document.getElementById("btnSave");
+    const btnCancel = document.getElementById("btnCancel");
     const txtDate = document.getElementById("textDate");
+
+    btnCancel.addEventListener("click", () => {
+        const confirmCancel = confirm("Tem certeza que deseja cancelar? As alterações não salvas serão perdidas.");
+        if (confirmCancel) {
+            window.location.href = "registrar_novo_treino.html";
+        }
+    });
 
     function parseCustomDate(dateString) {
         // O formato esperado é "dd/MM/yyyy HH:mm"
@@ -326,7 +334,6 @@ async function main() {
 
             const workoutId = generateWorkoutId(txtDate.value);
             const rotina = [];
-            const favoriteExercises = [];
             let orderCounter = 0;
 
             blocos.forEach(bloco => {
@@ -374,9 +381,8 @@ async function main() {
             await setDoc(workoutDocRef, workoutData);
 
             console.log("Rotina salva:", rotina);
-
-            if (switchFavorite.checked) {
-                const favoriteWorkoutTitle = document.getElementById("favoriteWorkoutTitle").value;
+            
+            if ((title && switchEditFavorite.checked) || switchFavorite.checked) {
                 const favoriteExercises = [];
                 rotina.forEach(exercise => {
                     favoriteExercises.push({
@@ -384,13 +390,30 @@ async function main() {
                         order: exercise.order
                     });
                 });
-                const favoriteWorkoutData = {
-                    title: favoriteWorkoutTitle,
-                    exercises: favoriteExercises
+
+                if (title && switchEditFavorite.checked) {
+                    const workoutDocRef = doc(db, "usuarios", currentUser.uid, "favoriteWorkouts", title);
+                    try {
+                        await updateDoc(workoutDocRef, {
+                            exercises: favoriteExercises
+                        });
+
+                    } catch (error) {
+                        console.error("Erro ao salvar alterações:", error);
+                        alert("Ocorreu um erro ao salvar as alterações.");
+                    }
                 }
-                const favoriteWorkoutDocRef = doc(db, "usuarios", currentUser.uid, "favoriteWorkouts", favoriteWorkoutTitle);
-                await setDoc(favoriteWorkoutDocRef, favoriteWorkoutData);
-                console.log("Treino favorito salvo:", favoriteWorkoutTitle);
+
+                if (switchFavorite.checked) {
+                    const favoriteWorkoutTitle = document.getElementById("favoriteWorkoutTitle").value;
+                    const favoriteWorkoutData = {
+                        title: favoriteWorkoutTitle,
+                        exercises: favoriteExercises
+                    }
+                    const favoriteWorkoutDocRef = doc(db, "usuarios", currentUser.uid, "favoriteWorkouts", favoriteWorkoutTitle);
+                    await setDoc(favoriteWorkoutDocRef, favoriteWorkoutData);
+                    console.log("Treino favorito salvo:", favoriteWorkoutTitle);
+                }
             }
             window.location.href = `treino.html?workoutId=${workoutId}`;
         } catch (error) {
