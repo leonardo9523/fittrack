@@ -92,3 +92,7 @@ body > .container {
   justify-content: space-between;
   align-items: center;
 }
+
+#lblEmailUserPage {
+  font-size: 20px;
+}
