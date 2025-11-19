@@ -40,7 +40,7 @@
                     <a class="nav-link" href="registrar_novo_treino.html">Registro de treinos</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="lblUserEmail" href="#">Perfil</a>
+                    <a class="nav-link" id="lblUserEmail" href="usuario.html">Perfil</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" id="lblLogout" href="#">Sair</a>
@@ -54,7 +54,7 @@
             <h2>Usuário</h2>
             <p class="dashboard-title" id="lblEmailUserPage"></p>
             <div class="container-fluid d-flex justify-content-between pt-4 pb-1 mt-2">
-                <button type="button" class="btn btn-primary rounded-4 d-flex flex-column">
+                <button type="button" class="btn btn-primary rounded-4 d-flex flex-column" id="btnEditPassword">
                     <span class="material-symbols-outlined">edit</span>
                     <span class="dashboard-title text-light m-0">Alterar senha</span>
                 </button>
@@ -63,6 +63,31 @@
                     <span class="dashboard-title text-light m-0">Deletar conta</span>
                 </button>
             </div>
+            <form>
+                <input 
+                    type="email" 
+                    autocomplete="email"  
+                    hidden 
+                    name="email" 
+                    id="txtEmailUpdatePassword"
+                />
+                <div class="mt-4" id="divUpdatePassword" hidden>
+                    <div class="mb-3 text-start">
+                        <label for="txtPasswordUpdate" class="form-label text-light">Senha</label>
+                        <input type="password" autocomplete="new-password" class="form-control bg-dark border-secondary text-light" id="txtPasswordCurrent" placeholder="Digite sua senha atual">
+                    </div>
+                    <div class="mb-3 text-start">
+                        <label for="txtPasswordUpdate" class="form-label text-light">Senha</label>
+                        <input type="password" autocomplete="new-password" class="form-control bg-dark border-secondary text-light" id="txtPasswordUpdate" placeholder="Digite sua nova senha">
+                    </div>
+                    <div class="mb-3 text-start">
+                        <input type="password" autocomplete="new-password" class="form-control bg-dark border-secondary text-light" id="txtPasswordUpdateConfirmation" placeholder="Confirme sua nova senha">
+                    </div>
+                    <button type="button" class="btn btn-success rounded-4 d-flex flex-column" id="btnSaveUpdatePassword">
+                        <span class="dashboard-title text-light m-0">Salvar nova senha</span>
+                    </button>
+                </div>
+            </form>
         </div>
     </main>
     <footer class="bg-dark text-light mt-5 py-4">
