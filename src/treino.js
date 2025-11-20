@@ -1,8 +1,9 @@
 import { db, auth } from './firebase-config.js';
-import { doc, getDoc, getDocs, deleteDoc, updateDoc, query, collection } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
+import { doc, getDoc, getDocs, deleteDoc, updateDoc, query, collection, setDoc } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
 
 async function main() {
+    //TODO: Dar oopção de salvar como treino favorito
     const userEmailLabel = document.getElementById("lblUserEmail");
     const mainContainer = document.querySelector("main.container"); // Container principal para o conteúdo
 
@@ -284,18 +285,49 @@ async function main() {
             });
         });
 
-        // << Botão de deletar o treino inteiro >>
-        const deleteWorkoutContainer = document.createElement('div');
-        deleteWorkoutContainer.className = "container-fluid d-flex justify-content-end pt-4 pb-1 mt-2";
-        deleteWorkoutContainer.innerHTML = `
+        //Botões de ação do treino (Favoritar e Deletar)
+        const workoutActionsContainer = document.createElement('div');
+        workoutActionsContainer.className = "container-fluid d-flex justify-content-between pt-4 pb-1 mt-2";
+        workoutActionsContainer.innerHTML = `
+            <button type="button" class="btn btn-warning rounded-4 d-flex flex-column me-2" id="btnFavoriteWorkout">
+                <span class="material-symbols-outlined">star</span>
+                <span class="dashboard-title text-light m-0">Favoritar treino?</span>
+            </button>
+            
             <button type="button" class="btn btn-danger rounded-4 d-flex flex-column" id="btnDeleteWorkout">
                 <span class="material-symbols-outlined">delete_forever</span>
                 <span class="dashboard-title text-light m-0">Deletar treino</span>
             </button>
         `;
-        mainContainer.appendChild(deleteWorkoutContainer);
+        mainContainer.appendChild(workoutActionsContainer);
+
         
-        deleteWorkoutContainer.querySelector('#btnDeleteWorkout').addEventListener('click', async () => {
+        workoutActionsContainer.querySelector('#btnFavoriteWorkout').addEventListener('click', async () => {
+            const confirmFavorite = prompt("Digite o título deste treino favorito:");
+            if (confirmFavorite) {
+                try {
+                    const workoutDocRef = doc(db, "usuarios", user.uid, "favoriteWorkouts", confirmFavorite);
+                    let favoriteExercises = [];
+                    workoutData.performedExercises.forEach((exercise) => {
+                        favoriteExercises.push({
+                            titulo: exercise.titulo,
+                            order: exercise.order
+                        });
+                    });
+                    const favoriteWorkoutDataTreino = {
+                        title: confirmFavorite,
+                        exercises: favoriteExercises
+                    };
+                    await setDoc(workoutDocRef, favoriteWorkoutDataTreino);
+                    alert("Treino favoritado com sucesso!");
+                } catch (error) {
+                    console.error("Erro ao favoritar treino:", error);
+                    alert("Ocorreu um erro ao tentar favoritar o treino.");
+                }
+            }
+        });
+        
+        workoutActionsContainer.querySelector('#btnDeleteWorkout').addEventListener('click', async () => {
             const confirmDelete = confirm("Você tem certeza que deseja deletar este treino permanentemente?");
             if (confirmDelete) {
                 try {

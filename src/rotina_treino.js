@@ -1,16 +1,21 @@
 import { db, auth } from './firebase-config.js';
-import { collection, getDocs, query, doc, setDoc, Timestamp, getDoc } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
+import { collection, getDocs, query, doc, setDoc, Timestamp, getDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
 
 
 // Função principal assíncrona para organizar o código
 async function main() {
 
+    //TODO: Adcionar cardio
+
     const userEmail = document.getElementById("lblUserEmail");
     let currentUser = null;
     const switchFavorite = document.getElementById("switchFavorite");
     const divSwitchFavorite = document.getElementById("divSwitchFavorite");
     const exercicioContainer = document.getElementById("exercicioContainer");
+    const divButtonsFavorite = document.getElementById("divButtonsFavorite");
+    const switchEditFavorite = document.getElementById("switchEditFavorite");
+    let title = null;
 
 
     onAuthStateChanged(auth, (user) => {
@@ -22,12 +27,14 @@ async function main() {
         userEmail.textContent = user.email;
 
         const urlParams = new URLSearchParams(window.location.search);
-        const title = urlParams.get('title');
+        title = urlParams.get('title');
         console.log("Título do treino favorito:", title);
 
         if (title) {
             criarBlocosDeExercicioTreinoFavorito(title, user.uid);
+            initializeFavoriteButtons(title, user.uid);
             divSwitchFavorite.hidden = true;
+            divButtonsFavorite.hidden = false;
         }
         else {
             console.log("Nenhum título de treino favorito fornecido.");
@@ -77,6 +84,24 @@ async function main() {
             return;
         }
         
+    }
+
+    async function initializeFavoriteButtons(title, uid) {
+        const btnDeleteFavorite = document.getElementById("btnDeleteFavorite");
+        btnDeleteFavorite.addEventListener("click", async () => {
+            const confirmDelete = confirm(`Você tem certeza que deseja remover esse treino favorito?`);
+            if (confirmDelete) {
+                try {
+                    await deleteDoc(doc(db, "usuarios", uid, "favoriteWorkouts", title));
+                    window.location.href = "registrar_novo_treino.html";
+                    alert("Treino favorito removido com sucesso!");
+                } catch (error) {
+                    console.error("Erro ao remover Treino favorito:", error);
+                    alert("Ocorreu um erro ao remover o Treino favorito.");
+                }
+            }
+        });
+        return;
     }
 
     // --- LÓGICA DE CRIAÇÃO DO BLOCO DE EXERCÍCIO ---
@@ -144,11 +169,10 @@ async function main() {
             seriesInputsContainer.innerHTML = '';
             if (isNaN(num) || num < 1 || num > 10) return;
 
-            for (let i = 1; i <= num; i++) {
-                seriesInputsContainer.innerHTML += `
-                    <div class="row g-2 mb-2 align-items-center">
+            seriesInputsContainer.innerHTML += `
+                <div class="row g-2 mb-2 align-items-center">
                     <div class="col-auto">
-                        <label class="form-label text-light m-0">Série ${i}:</label>
+                        <label class="form-label text-light m-0">Série 1:</label>
                     </div>
                     <div class="col">
                         <div class="input-group">
@@ -166,6 +190,25 @@ async function main() {
                         </button>
                         </div>
                     </div>
+                </div>
+            `;
+
+            for (let i = 2; i <= num; i++) {
+                seriesInputsContainer.innerHTML += `
+                    <div class="row g-2 mb-2 align-items-center">
+                        <div class="col-auto">
+                            <label class="form-label text-light m-0">Série ${i}:</label>
+                        </div>
+                        <div class="col">
+                            <div class="input-group">
+                            <input type="number" class="form-control bg-secondary text-light weight-input" placeholder="Carga (kg)">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="input-group">
+                            <input type="number" class="form-control bg-secondary text-light reps-input" placeholder="Reps">
+                            </div>
+                        </div>
                     </div>
                 `;
             }
@@ -242,7 +285,15 @@ async function main() {
         
 
     const btnSave = document.getElementById("btnSave");
+    const btnCancel = document.getElementById("btnCancel");
     const txtDate = document.getElementById("textDate");
+
+    btnCancel.addEventListener("click", () => {
+        const confirmCancel = confirm("Tem certeza que deseja cancelar? As alterações não salvas serão perdidas.");
+        if (confirmCancel) {
+            window.location.href = "registrar_novo_treino.html";
+        }
+    });
 
     function parseCustomDate(dateString) {
         // O formato esperado é "dd/MM/yyyy HH:mm"
@@ -284,44 +335,32 @@ async function main() {
 
             const workoutId = generateWorkoutId(txtDate.value);
             const rotina = [];
-            const favoriteExercises = [];
             let orderCounter = 0;
 
             blocos.forEach(bloco => {
                 const titulo = bloco.querySelector('.exercise-input').value;
-
                 const sets = [];
-                const seriesContainer = bloco.querySelector('.series-inputs-container');
-                if (seriesContainer) {
-                    // Seleciona todas as divs de linha que representam uma série
-                    const allSeriesDivs = seriesContainer.querySelectorAll('.row');
+                // Seleciona todos os inputs de peso e repetições dentro do bloco do exercício
+                const weightInputs = bloco.querySelectorAll('.weight-input');
+                const repsInputs = bloco.querySelectorAll('.reps-input');
 
-                    // Itera sobre CADA div de série
-                    allSeriesDivs.forEach(seriesDiv => {
-                        const weightInput = seriesDiv.querySelector('.weight-input');
-                        const repsInput = seriesDiv.querySelector('.reps-input');
+                // Itera sobre os inputs para obter os valores de cada série
+                for (let i = 0; i < weightInputs.length; i++) {
+                    const weight = parseFloat(weightInputs[i].value) || 0;
+                    const reps = parseInt(repsInputs[i].value) || 0;
 
-                        if (weightInput && repsInput) {
-                            const weight = parseFloat(weightInput.value) || 0;
-                            const reps = parseInt(repsInput.value) || 0;
-
-                            if (reps > 0) { // Adiciona a série apenas se tiver repetições
-                                sets.push({ weight, reps });
-                            }
-                        }
-                    });
+                    // Adiciona a série apenas se o número de repetições for maior que 0
+                    if (reps > 0) {
+                        sets.push({ weight, reps });
+                        console.log(`Série ${i + 1} adicionada:`, sets[sets.length - 1]);
+                    }
                 }
-
-                console.log("Exercício:", titulo, "Séries:", sets);
                 
+                console.log("Exercício:", titulo, "Séries:", sets);
                 if (sets.length > 0) {
                     orderCounter++;
                     console.log(orderCounter, titulo, sets);
-                    rotina.push({
-                        order: parseInt(orderCounter),
-                        titulo: titulo,
-                        sets: sets
-                    });
+                    rotina.push({ order: parseInt(orderCounter), titulo: titulo, sets: sets });
                 }
             });
 
@@ -343,9 +382,8 @@ async function main() {
             await setDoc(workoutDocRef, workoutData);
 
             console.log("Rotina salva:", rotina);
-
-            if (switchFavorite.checked) {
-                const favoriteWorkoutTitle = document.getElementById("favoriteWorkoutTitle").value;
+            
+            if ((title && switchEditFavorite.checked) || switchFavorite.checked) {
                 const favoriteExercises = [];
                 rotina.forEach(exercise => {
                     favoriteExercises.push({
@@ -353,15 +391,31 @@ async function main() {
                         order: exercise.order
                     });
                 });
-                const favoriteWorkoutData = {
-                    title: favoriteWorkoutTitle,
-                    exercises: favoriteExercises
+
+                if (title && switchEditFavorite.checked) {
+                    const workoutDocRef = doc(db, "usuarios", currentUser.uid, "favoriteWorkouts", title);
+                    try {
+                        await updateDoc(workoutDocRef, {
+                            exercises: favoriteExercises
+                        });
+
+                    } catch (error) {
+                        console.error("Erro ao salvar alterações:", error);
+                        alert("Ocorreu um erro ao salvar as alterações.");
+                    }
                 }
-                const favoriteWorkoutDocRef = doc(db, "usuarios", currentUser.uid, "favoriteWorkouts", favoriteWorkoutTitle);
-                await setDoc(favoriteWorkoutDocRef, favoriteWorkoutData);
-                console.log("Treino favorito salvo:", favoriteWorkoutTitle);
+
+                if (switchFavorite.checked) {
+                    const favoriteWorkoutTitle = document.getElementById("favoriteWorkoutTitle").value;
+                    const favoriteWorkoutData = {
+                        title: favoriteWorkoutTitle,
+                        exercises: favoriteExercises
+                    }
+                    const favoriteWorkoutDocRef = doc(db, "usuarios", currentUser.uid, "favoriteWorkouts", favoriteWorkoutTitle);
+                    await setDoc(favoriteWorkoutDocRef, favoriteWorkoutData);
+                    console.log("Treino favorito salvo:", favoriteWorkoutTitle);
+                }
             }
-                setTimeout(() => {
             window.location.href = `treino.html?workoutId=${workoutId}`;
 
     }, 7000); 

@@ -73,5 +73,5 @@ node_modules/
 node_modules/
 dist/
 
-# vscode
+# .vscode
 .vscode/

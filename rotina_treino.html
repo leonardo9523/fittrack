@@ -26,41 +26,46 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-        <a class="navbar-brand d-flex align-items-center" href="registrar_novo_treino.html">
-            <img src="Img/logo.png" alt="Logo FitTrack" class="header-footer-logo me-2">
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
-            <ul class="navbar-nav mb-2 mb-lg-0">
-                <!-- <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="dashboard.html">Home</a>
-                </li> -->
-                <li class="nav-item">
-                    <a class="nav-link" href="registrar_novo_treino.html">Registro de treinos</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="lblUserEmail" href="#">Perfil</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" id="lblLogout" href="#">Sair</a>
-                </li>
-            </ul>
-        </div>
+            <a class="navbar-brand d-flex align-items-center" href="registrar_novo_treino.html">
+                <img src="Img/logo.png" alt="Logo FitTrack" class="header-footer-logo me-2">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+                <ul class="navbar-nav mb-2 mb-lg-0">
+                    <!-- <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="dashboard.html">Home</a>
+                    </li> -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="registrar_novo_treino.html">Registro de treinos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="lblUserEmail" href="usuario.html">Perfil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="lblLogout" href="#">Sair</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
     <main class="container">
-        <div class="align-items-start justify-content-between mt-3 pt-4">
+        <div class="d-flex align-items-start justify-content-between mt-3 pt-4">
             <h1 class="dashboard-title text-light">Registro de treino</h1>
+            <button type="button" class="btn btn-sm btn-delete-favorite" id="btnDeleteFavorite"><span class="material-symbols-outlined">delete</span></button>
         </div>
         <form>
             <div class="mb-3 text-start">
+                <div class="form-check form-switch" id="divButtonsFavorite" hidden>
+                    <input class="form-check-input" type="checkbox" role="switch" id="switchEditFavorite">
+                    <label class="form-label text-light" for="switchEditFavorite">Editar treino favorito?</label>
+                </div>
                 <div class="form-check form-switch" id="divSwitchFavorite">
                     <input class="form-check-input" type="checkbox" role="switch" id="switchFavorite">
                     <label class="form-label text-light" for="switchFavorite">Salvar como treino favorito?</label>
                 </div>
-                <div class="mb-3 visible" id="divTitleFavorite" hidden>
+                <div class="mb-3" id="divTitleFavorite" hidden>
                     <label class="form-label text-light">Título do treino</label>
                     <input type="text" class="form-control bg-dark border-primary text-light" id="favoriteWorkoutTitle" placeholder="Ex: Treino A">
                 </div>
@@ -97,7 +102,7 @@
             </script>
             <div class="mb-3 text-start" id="exercicioContainer"></div>
             <div class="container-fluid d-flex justify-content-between pt-4 pb-1 mt-2">
-                <button type="button" class="btn btn-danger rounded-4 d-flex flex-column">
+                <button type="button" class="btn btn-danger rounded-4 d-flex flex-column" id="btnCancel">
                     <span class="material-symbols-outlined">cancel</span>
                     <span class="dashboard-title text-light m-0">Cancelar</span>
                 </button>
