@@ -75,3 +75,8 @@ dist/
 
 # .vscode
 .vscode/
+
+.DS_Store
+cypress/downloads/
+cypress/screenshots/
+cypress/videos/

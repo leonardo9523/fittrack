@@ -417,8 +417,6 @@ async function main() {
                 }
             }
             window.location.href = `treino.html?workoutId=${workoutId}`;
-
-    }, 7000); 
         } catch (error) {
             console.error("Erro ao salvar a rotina:", error);
             alert("Ocorreu um erro ao salvar o treino. Tente novamente.");

@@ -11,7 +11,8 @@ export default defineConfig({
         historico: 'historico.html',
         registrarNovoTreino: 'registrar_novo_treino.html',
         rotinaTreino: 'rotina_treino.html',
-        treino: 'treino.html'
+        treino: 'treino.html',
+        usuario: 'usuario.html'
       }
     }
   }
