@@ -46,6 +46,6 @@ form.addEventListener("submit", async (e) => {
   } catch (error) {
       // Tratamento de erros de login
       console.error("Erro ao fazer login:", error.code, error.message);
-      // É uma boa prática não dizer se o erro foi no email ou na senha
-      messageElement.textContent = "E-mail ou senha inválidos.";  }
+      messageElement.textContent = "E-mail ou senha inválidos.";  
+    }
 });
