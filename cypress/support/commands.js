@@ -23,3 +23,40 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+//Comando para cadastro de usuário com sucesso
+Cypress.Commands.add('successSignUp', (project) => {
+    cy.contains('a', 'Cadastre-se')
+      .click()
+    cy.get('#txtEmailSignup')
+      .should('be.visible')
+      .type(project.email)
+    cy.get('#txtPasswordSignup')
+      .should('be.visible')
+      .type(project.senha)
+    cy.get('#txtPasswordSignupConfirmation')
+      .should('be.visible')
+      .type(project.senha)
+    cy.contains('button', 'Cadastre-se')
+      .click()
+    cy.url({ timeout: 10000 }).should('include', 'registrar_novo_treino.html');
+    cy.get('#lblUserEmail', { timeout: 10000 })
+      .should('be.visible')
+      .and('have.text', project.email);
+})
+
+// Comando para limpar o Auth
+Cypress.Commands.add('clearFirebaseAuth', () => {
+  cy.request({
+    method: 'DELETE',
+    url: `http://127.0.0.1:9099/emulator/v1/projects/the-fittrack-project/accounts`,
+  });
+});
+
+// Comando para limpar o Firestore
+Cypress.Commands.add('clearFirestore', () => {
+  cy.request({
+    method: 'DELETE',
+    url: `http://127.0.0.1:8080/emulator/v1/projects/the-fittrack-project/databases/(default)/documents`,
+  });
+});

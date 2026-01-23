@@ -10,6 +10,8 @@ describe('Login e cadastro FitTrack', () => {
         console.log('DB do Firebase deletado com sucesso');
       };
     });
+    cy.clearFirebaseAuth()
+    cy.clearFirestore()
     cy.visit('http://localhost:5173')
   })
   const project = {
@@ -17,25 +19,12 @@ describe('Login e cadastro FitTrack', () => {
     senha: 'Senha123'
   }
   it('cadastro na aplicação', () => {
-    cy.contains('a', 'Cadastre-se')
-      .click()
-    cy.get('#txtEmailSignup')
-      .should('be.visible')
-      .type(project.email)
-    cy.get('#txtPasswordSignup')
-      .should('be.visible')
-      .type(project.senha)
-    cy.get('#txtPasswordSignupConfirmation')
-      .should('be.visible')
-      .type(project.senha)
-    cy.contains('button', 'Cadastre-se')
-      .click()
-    cy.url({ timeout: 10000 }).should('include', 'registrar_novo_treino.html');
-    cy.get('#lblUserEmail', { timeout: 10000 })
-      .should('be.visible')
-      .and('have.text', project.email);
+    cy.successSignUp(project)
   })
-  it('login na aplicação', () => {
+  it('cadastro seguido de signout e login na aplicação', () => {
+    cy.successSignUp(project)
+    cy.contains('a', 'Sair')
+      .click()
     cy.get('#txtEmailSignin')
       .should('be.visible')
       .type('teste@email.com')
