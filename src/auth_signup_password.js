@@ -40,7 +40,7 @@ form.addEventListener("submit", async (e) => {
     messageElement.style.color = "green";
     messageElement.textContent = "Cadastro realizado com sucesso! Redirecionando...";    // Redirecionar para a página de dashboard
     setTimeout(() => {
-      window.location.href = "registrar_novo_treino.html.html";
+      window.location.href = "registrar_novo_treino.html";
     }, 1500);  
   } catch (error) {
       console.error("Erro ao cadastrar:", error.code, error.message);

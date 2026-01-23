@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
-import {  getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
-import { getFirestore, setDoc } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
+import {  getAuth, connectAuthEmulator } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
+import { getFirestore, connectFirestoreEmulator } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -15,6 +15,14 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+if (location.hostname === "localhost") {
+  // Conectar Auth (padrão porta 9099)
+  connectAuthEmulator(auth, "http://127.0.0.1:9099");
+
+  // Conectar Firestore (padrão porta 8080)
+  connectFirestoreEmulator(db, '127.0.0.1', 8081);
+}
 
 export { auth }; // Exportando auth e funções necessárias
 export { db }; // Exportando db para uso em outros módulos

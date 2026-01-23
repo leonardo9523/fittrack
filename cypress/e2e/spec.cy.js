@@ -12,6 +12,29 @@ describe('Login e cadastro FitTrack', () => {
     });
     cy.visit('http://localhost:5173')
   })
+  const project = {
+    email: 'teste@email.com',
+    senha: 'Senha123'
+  }
+  it('cadastro na aplicação', () => {
+    cy.contains('a', 'Cadastre-se')
+      .click()
+    cy.get('#txtEmailSignup')
+      .should('be.visible')
+      .type(project.email)
+    cy.get('#txtPasswordSignup')
+      .should('be.visible')
+      .type(project.senha)
+    cy.get('#txtPasswordSignupConfirmation')
+      .should('be.visible')
+      .type(project.senha)
+    cy.contains('button', 'Cadastre-se')
+      .click()
+    cy.url({ timeout: 10000 }).should('include', 'registrar_novo_treino.html');
+    cy.get('#lblUserEmail', { timeout: 10000 })
+      .should('be.visible')
+      .and('have.text', project.email);
+  })
   it('login na aplicação', () => {
     cy.get('#txtEmailSignin')
       .should('be.visible')
