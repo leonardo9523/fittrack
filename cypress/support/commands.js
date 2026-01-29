@@ -63,5 +63,6 @@ Cypress.Commands.add('clearFirestore', () => {
   cy.request({
     method: 'DELETE',
     url: `http://127.0.0.1:8080/emulator/v1/projects/the-fittrack-project/databases/(default)/documents`,
+    failOnStatusCode: false
   });
 });
