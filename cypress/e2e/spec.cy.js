@@ -97,6 +97,8 @@ describe('Login e cadastro FitTrack', () => {
       .should('be.visible')
       .and('have.text', 'Erro: O e-mail fornecido não é válido.')
   })
+
+  //Login
   it('cadastro seguido de signout e login na aplicação', () => {
     cy.successSignUp(project)
     cy.contains('a', 'Sair')
@@ -123,5 +125,12 @@ describe('Login e cadastro FitTrack', () => {
     cy.get('#signin-message')
       .should('be.visible')
       .and('have.text', 'E-mail ou senha inválidos.')
+  })
+  it('validar alerta de erro no login ao não preencher os campos', () => {
+    cy.on('window:alert', (texto) => {
+      expect(texto).to.equal('Por favor, preencha todos os campos.');
+    });
+    cy.contains('button', 'Entrar')
+      .click()
   })
 })

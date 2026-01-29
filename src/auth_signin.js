@@ -32,7 +32,7 @@ form.addEventListener("submit", async (e) => {
   if (!email || !password) {
       alert("Por favor, preencha todos os campos.");
       return;
-    }
+  }
 
   try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
