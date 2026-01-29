@@ -1,5 +1,5 @@
 import { auth, db } from './firebase-config.js'; 
-import { createUserWithEmailAndPassword, validatePassword } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
+import { createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-auth.js";
 import { setDoc, doc } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
 
 
@@ -8,6 +8,21 @@ const emailInput = document.getElementById("txtEmailSignup");
 const passwordInput = document.getElementById("txtPasswordSignup");
 const passwordConfirmationInput = document.getElementById("txtPasswordSignupConfirmation");
 const messageElement = document.getElementById("signup-message");
+
+let redirectDone = false
+
+onAuthStateChanged(auth, async (user) => {
+  if (user && !redirectDone) {
+    redirectDone = true
+
+    await setDoc(doc(db, "usuarios", user.uid), {
+      email: user.email,
+      criadoEm: new Date()
+    })
+
+    window.location.href = "registrar_novo_treino.html"
+  }
+})
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -31,17 +46,11 @@ form.addEventListener("submit", async (e) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
-    await setDoc(doc(db, "usuarios", user.uid), {
-      email: user.email,
-      criadoEm: new Date()
-    });
     
     console.log("Cadastro realizado com sucesso!", user);
     messageElement.style.color = "green";
     messageElement.textContent = "Cadastro realizado com sucesso! Redirecionando...";    // Redirecionar para a página de dashboard
-    setTimeout(() => {
-      window.location.href = "registrar_novo_treino.html";
-    }, 1500);  
+    window.location.href = "registrar_novo_treino.html";
   } catch (error) {
       console.error("Erro ao cadastrar:", error.code, error.message);
       if (error.code === 'auth/email-already-in-use') {
