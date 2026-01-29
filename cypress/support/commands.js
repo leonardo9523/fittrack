@@ -45,6 +45,11 @@ Cypress.Commands.add('successSignUp', (project) => {
       .and('have.text', project.email);
 })
 
+Cypress.Commands.add('goToSignUpPage', () => {
+    cy.contains('a', 'Cadastre-se')
+      .click()
+})
+
 // Comando para limpar o Auth
 Cypress.Commands.add('clearFirebaseAuth', () => {
   cy.request({
