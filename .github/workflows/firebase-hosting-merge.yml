@@ -33,7 +33,7 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
-          command: firebase emulators:exec "cypress run" --project the-fittrack-project
+          command: firebase emulators:exec "npx cypress run" --project the-fittrack-project
           start: npm run dev
           wait-on: 'http://localhost:5173'
         env:
