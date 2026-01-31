@@ -50,8 +50,8 @@ jobs:
           record: true
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-          FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
-          FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
           FIREBASE_AUTH_EMULATOR_HOST: localhost:9099
           FIRESTORE_EMULATOR_HOST: localhost:8080
 
