@@ -34,14 +34,12 @@ jobs:
         run: npm install -g wait-on
 
       - name: Start Firebase Emulators
-        run: firebase emulators:start --only auth,firestore,hosting --project the-fittrack-project &
+        run: firebase emulators:start --only auth,firestore,hosting --project ${{ secrets.VITE_FIREBASE_PROJECT_ID }} &
         env:
           FIREBASE_PROJECT_ID: ${{secrets.VITE_FIREBASE_PROJECT_ID}}
 
       - name: Wait for Firestore Emulator
-        run: 
-          wait-on tcp:127.0.0.1:8080
-          wait-on tcp:127.0.0.1:9099
+        run: wait-on tcp:127.0.0.1:8080
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
