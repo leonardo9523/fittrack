@@ -39,7 +39,9 @@ jobs:
           FIREBASE_PROJECT_ID: ${{secrets.VITE_FIREBASE_PROJECT_ID}}
 
       - name: Wait for Firestore Emulator
-        run: wait-on tcp:127.0.0.1:8080
+        run: 
+          wait-on tcp:127.0.0.1:8080
+          wait-on tcp:127.0.0.1:9099
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
@@ -50,8 +52,8 @@ jobs:
           record: true
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
-          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          CYPRESS_VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          CYPRESS_VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
           FIREBASE_AUTH_EMULATOR_HOST: localhost:9099
           FIRESTORE_EMULATOR_HOST: localhost:8080
 
