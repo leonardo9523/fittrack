@@ -25,8 +25,8 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
 //Comando para cadastro de usuário com sucesso
-const projectId = Cypress.env('FIREBASE_PROJECT_ID')
-const apiKey = Cypress.env('FIREBASE_API_KEY')
+const projectId = Cypress.env('VITE_FIREBASE_PROJECT_ID')
+const apiKey = Cypress.env('VITE_FIREBASE_API_KEY')
 Cypress.Commands.add('successSignUp', (project) => {
     cy.contains('a', 'Cadastre-se')
       .click()
