@@ -58,11 +58,8 @@ describe('Login e cadastro FitTrack', () => {
       .should('be.visible')
       .and('have.text', 'Erro: A senha deve ter no mínimo 6 caracteres.')
   })
-  //refatorar o código abaixo com cy.request
   it('validar mensagem de Erro: Este e-mail já está em uso.', () => {
-    cy.successSignUp(project)
-    cy.contains('a', 'Sair')
-      .click()
+    cy.CreateFirebaseAuthUser(project)
     cy.goToSignUpPage()
     cy.get('#txtEmailSignup')
       .should('be.visible')

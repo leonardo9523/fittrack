@@ -25,6 +25,8 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
 //Comando para cadastro de usuário com sucesso
+const projectId = Cypress.env('FIREBASE_PROJECT_ID')
+const apiKey = Cypress.env('FIREBASE_API_KEY')
 Cypress.Commands.add('successSignUp', (project) => {
     cy.contains('a', 'Cadastre-se')
       .click()
@@ -54,7 +56,7 @@ Cypress.Commands.add('goToSignUpPage', () => {
 Cypress.Commands.add('clearFirebaseAuth', () => {
   cy.request({
     method: 'DELETE',
-    url: `http://127.0.0.1:9099/emulator/v1/projects/the-fittrack-project/accounts`,
+    url: `http://127.0.0.1:9099/emulator/v1/projects/${projectId}/accounts`,
   });
 });
 
@@ -62,7 +64,15 @@ Cypress.Commands.add('clearFirebaseAuth', () => {
 Cypress.Commands.add('clearFirestore', () => {
   cy.request({
     method: 'DELETE',
-    url: `http://127.0.0.1:8080/emulator/v1/projects/the-fittrack-project/databases/(default)/documents`,
+    url: `http://127.0.0.1:8080/emulator/v1/projects/${projectId}/databases/(default)/documents`,
     failOnStatusCode: false
   });
 });
+
+Cypress.Commands.add('CreateFirebaseAuthUser', (project) => {
+    cy.request({
+        method: 'POST',
+        url: `http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`,
+        body: {"email":project.email,"password":project.senha,"returnSecureToken":true}
+    })
+})

@@ -65,6 +65,7 @@ node_modules/
 # dotenv environment variables file
 .env
 .env.*
+cypress.env.json
 
 # dataconnect generated files
 .dataconnect
