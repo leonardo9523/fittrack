@@ -25,8 +25,6 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
 //Comando para cadastro de usuário com sucesso
-const projectId = Cypress.env('VITE_FIREBASE_PROJECT_ID')
-const apiKey = Cypress.env('VITE_FIREBASE_API_KEY')
 Cypress.Commands.add('successSignUp', (project) => {
     cy.contains('a', 'Cadastre-se')
       .click()
@@ -54,6 +52,7 @@ Cypress.Commands.add('goToSignUpPage', () => {
 
 // Comando para limpar o Auth
 Cypress.Commands.add('clearFirebaseAuth', () => {
+    const projectId = Cypress.env('VITE_FIREBASE_PROJECT_ID') 
   cy.request({
     method: 'DELETE',
     url: `http://127.0.0.1:9099/emulator/v1/projects/${projectId}/accounts`,
@@ -62,6 +61,7 @@ Cypress.Commands.add('clearFirebaseAuth', () => {
 
 // Comando para limpar o Firestore
 Cypress.Commands.add('clearFirestore', () => {
+        const projectId = Cypress.env('VITE_FIREBASE_PROJECT_ID') 
   cy.request({
     method: 'DELETE',
     url: `http://127.0.0.1:8080/emulator/v1/projects/${projectId}/databases/(default)/documents`,
@@ -70,6 +70,7 @@ Cypress.Commands.add('clearFirestore', () => {
 });
 
 Cypress.Commands.add('CreateFirebaseAuthUser', (project) => {
+    const apiKey = Cypress.env('VITE_FIREBASE_API_KEY')
     cy.request({
         method: 'POST',
         url: `http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`,
