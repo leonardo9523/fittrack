@@ -9,6 +9,13 @@ on:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+    env:
+      VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+      VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+      FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+      # Cypress precisa do prefixo CYPRESS_
+      CYPRESS_VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+      CYPRESS_VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v4
 
@@ -38,8 +45,19 @@ jobs:
         env:
           FIREBASE_PROJECT_ID: ${{secrets.VITE_FIREBASE_PROJECT_ID}}
 
-      - name: Wait for Firestore Emulator
-        run: wait-on tcp:127.0.0.1:8080
+      - name: Debug env vars
+        run: |
+          echo "FIREBASE_PROJECT_ID=$FIREBASE_PROJECT_ID"
+          echo "FIREBASE_AUTH_EMULATOR_HOST=$FIREBASE_AUTH_EMULATOR_HOST"
+          echo "CYPRESS_baseUrl=$CYPRESS_baseUrl"
+          echo "CYPRESS_FIREBASE_API_KEY=$CYPRESS_FIREBASE_API_KEY"
+          echo "CYPRESS_FIREBASE_PROJECT_ID=$CYPRESS_FIREBASE_PROJECT_ID"
+          echo "VITE_FIREBASE_API_KEY=$VITE_FIREBASE_API_KEY"
+          echo "VITE_FIREBASE_PROJECT_ID=$VITE_FIREBASE_PROJECT_ID"
+          echo "TESTE MANUAL"
+          echo "FIREBASE_PROJECT_ID=$FIREBASE_PROJECT_ID"
+          echo "CYPRESS_FIREBASE_PROJECT_ID=$CYPRESS_FIREBASE_PROJECT_ID"
+          echo "SECRET_FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}"
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
@@ -51,21 +69,6 @@ jobs:
         env:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-          CYPRESS_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
-          CYPRESS_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           FIREBASE_AUTH_EMULATOR_HOST: localhost:9099
           FIRESTORE_EMULATOR_HOST: localhost:8080
-
-      - name: Build
-        run: npm run build
-        env:
-          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
-          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-
-      - uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_THE_FITTRACK_PROJECT }}
-          channelId: live
-          projectId: the-fittrack-project
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
