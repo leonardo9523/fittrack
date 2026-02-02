@@ -15,6 +15,7 @@ async function main() {
     const exercicioContainer = document.getElementById("exercicioContainer");
     const divButtonsFavorite = document.getElementById("divButtonsFavorite");
     const switchEditFavorite = document.getElementById("switchEditFavorite");
+    const divDeleteFavorite = document.getElementById("divDeleteFavorite");
     let title = null;
 
 
@@ -35,6 +36,7 @@ async function main() {
             initializeFavoriteButtons(title, user.uid);
             divSwitchFavorite.hidden = true;
             divButtonsFavorite.hidden = false;
+            divDeleteFavorite.hidden = false;
         }
         else {
             console.log("Nenhum título de treino favorito fornecido.");
