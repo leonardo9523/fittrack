@@ -50,6 +50,18 @@ Cypress.Commands.add('goToSignUpPage', () => {
       .click()
 })
 
+Cypress.Commands.add('logIn', (project) => {
+    cy.get('#txtEmailSignin')
+      .should('be.visible')
+      .type(project.email)
+    cy.get('#txtPasswordSignin')
+      .should('be.visible')
+      .type(project.senha)
+    cy.contains('button', 'Entrar')
+      .click()
+    cy.contains('h1', 'Treinos favoritos')
+})
+
 // Comando para limpar o Auth
 Cypress.Commands.add('clearFirebaseAuth', () => {
     const projectId = Cypress.env('VITE_FIREBASE_PROJECT_ID') 
@@ -75,5 +87,20 @@ Cypress.Commands.add('CreateFirebaseAuthUser', (project) => {
         method: 'POST',
         url: `http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`,
         body: {"email":project.email,"password":project.senha,"returnSecureToken":true}
+    })
+})
+
+Cypress.Commands.add('CreateFirebaseAuthUserAndFirestore', (project) => {
+    const apiKey = Cypress.env('VITE_FIREBASE_API_KEY')
+    const projectId = Cypress.env('VITE_FIREBASE_PROJECT_ID') 
+    cy.request({
+      method: 'POST',
+      url: `http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`,
+      body: {"email":project.email,"password":project.senha,"returnSecureToken":true}
+    })
+    cy.request({
+      method: 'POST',
+      url: `http://127.0.0.1:8080/v1beta1/projects/${projectId}/databases/(default)/documents/usuarios`,
+      body: {"fields":{"email":{"stringValue": project.email},"criadoEm":{"timestampValue": new Date()}}}
     })
 })

@@ -131,3 +131,33 @@ describe('Login e cadastro FitTrack', () => {
       .click()
   })
 })
+
+describe('Registro de treinos', () => {
+  before(() => {
+    cy.window().then((win) => {
+      const deleteDbRequest = win.indexedDB.deleteDatabase('firebaseLocalStorageDb');
+          
+      deleteDbRequest.onerror = (event) => {
+        console.error('Erro ao deletar DB do Firebase:', event);
+      };
+      deleteDbRequest.onsuccess = (event) => {
+        console.log('DB do Firebase deletado com sucesso');
+      };
+    });
+    cy.clearFirebaseAuth()
+    cy.clearFirestore()
+    cy.CreateFirebaseAuthUserAndFirestore(project)
+    cy.visit('http://localhost:5173')
+    cy.logIn(project)
+  })
+  beforeEach(() => {
+    cy.visit('http://localhost:5173')
+  })
+    const project = {
+    email: 'teste@email.com',
+    senha: 'Senha123'
+  }
+  it.only('Registrar treino', () => {
+
+  })
+})
