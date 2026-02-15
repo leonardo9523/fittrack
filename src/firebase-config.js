@@ -21,7 +21,7 @@ if (location.hostname === "localhost") {
   connectAuthEmulator(auth, "http://127.0.0.1:9099");
 
   // Conectar Firestore (padrão porta 8080)
-  connectFirestoreEmulator(db, '127.0.0.1', 8081);
+  connectFirestoreEmulator(db, '127.0.0.1', 8080);
 }
 
 export { auth }; // Exportando auth e funções necessárias
