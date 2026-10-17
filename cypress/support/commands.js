@@ -104,3 +104,9 @@ Cypress.Commands.add('CreateFirebaseAuthUserAndFirestore', (project) => {
       body: {"fields":{"email":{"stringValue": project.email},"criadoEm":{"timestampValue": new Date()}}}
     })
 })
+
+Cypress.Commands.add('preencherCampo', (xPath, value) => {
+    cy.get(xPath)
+      .should('be.visible')
+      .type(value)
+})
