@@ -96,17 +96,32 @@ Cypress.Commands.add('CreateFirebaseAuthUserAndFirestore', (project) => {
     cy.request({
       method: 'POST',
       url: `http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`,
-      body: {"email":project.email,"password":project.senha,"returnSecureToken":true}
-    })
-    cy.request({
-      method: 'POST',
-      url: `http://127.0.0.1:8080/v1beta1/projects/${projectId}/databases/(default)/documents/usuarios`,
-      body: {"fields":{"email":{"stringValue": project.email},"criadoEm":{"timestampValue": new Date()}}}
+      body: { email: project.email, password: project.senha, returnSecureToken: true }
+    }).then(({ body }) => {
+      const uid = body.localId
+
+      cy.request({
+        method: 'PATCH',
+        url: `http://127.0.0.1:8080/v1/projects/${projectId}/databases/(default)/documents/usuarios/${uid}`,
+        headers: { Authorization: 'Bearer owner' }, // ignora as security rules no emulador
+        body: {
+          fields: {
+            email: { stringValue: project.email },
+            criadoEm: { timestampValue: new Date().toISOString() }
+          }
+        }
+      })
     })
 })
 
 Cypress.Commands.add('preencherCampo', (xPath, value) => {
     cy.get(xPath)
       .should('be.visible')
+      .clear()
       .type(value)
+})
+
+Cypress.Commands.add('clicarBotao', (value) => {
+    cy.contains('button', value)
+      .click()
 })
