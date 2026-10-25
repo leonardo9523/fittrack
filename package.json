@@ -13,10 +13,10 @@
     "webpack-cli": "^6.0.1"
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host 0.0.0.0 --port 4173",
     "build": "vite build",
-    "preview": "vite preview",
-        "test:e2e": "cypress run",
+    "preview": "vite preview --host 0.0.0.0 --port 4173",
+    "test:e2e": "cypress run",
     "test:e2e:open": "cypress open"
   },
   "keywords": [],
